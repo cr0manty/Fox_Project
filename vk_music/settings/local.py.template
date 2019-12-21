@@ -1,0 +1,22 @@
+from .settings import *
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+DATABASES = {
+    'default': {
+        'CONN_MAX_AGE': 0,
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'vk_music',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '3306',
+        'OPTIONS': {
+           'init_command': 'SET default_storage_engine=InnoDB',
+           'charset': 'utf8',
+           'use_unicode': True,
+        },
+    }
+}
