@@ -55,24 +55,24 @@ class UserSongListAPIView(APIView):
             try:
                 try:
                     song = Song.objects.get(song_id=track.get('id'))
+                    song.users.add(user)
+                    song.save()
                 except Song.DoesNotExist:
-                    song = Song(
+                    song = Song.objects.create(
                         song_id=track.get('id'),
                         artist=track.get('artist'),
                         name=track.get('title'),
                         duration=track.get('duration'),
                         download=track.get('url'),
                     )
+                    song.users.add(user)
                     song.save()
-                song.users.add(user)
-                song.save()
-
-                songs_added['songs'].append({
-                    'artist': track.get('artist'),
-                    'name': track.get('title'),
-                    'duration': track.get('duration')
-                })
-                songs_added['amount'] += 1
+                    songs_added['songs'].append({
+                        'artist': track.get('artist'),
+                        'name': track.get('title'),
+                        'duration': track.get('duration')
+                    })
+                    songs_added['amount'] += 1
             except:
                 pass
         return Response(songs_added, status=201)
