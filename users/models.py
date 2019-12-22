@@ -48,6 +48,6 @@ class Proxy(models.Model):
 class FriendList(models.Model):
     user = models.ForeignKey(User, related_name='main_user', on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name='user_friend', on_delete=models.CASCADE)
-    confirm = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed_at = models.DateTimeField(null=True)

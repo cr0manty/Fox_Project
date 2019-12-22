@@ -1,42 +1,49 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 
 from vk_api import VkApi, audio
 
 from .serializers import SongListSerializer
 from songs.models import Song
-from users.models import UserLocation, Proxy
+from users.models import UserLocation, Proxy, FriendList
+
+
+def get_vk_audio(user):
+    vk_session = VkApi(login=user.username, password=user.dump_password, config_filename='config.json')
+    vk_session.auth()
+    vk_session.get_api()
+    return audio.VkAudio(vk_session)
 
 
 class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
 
-    def get(self, request, *args, **kwargs):
-        user_id = self.kwargs.get('user_id')
-        if request.user.user_id != user_id:
-            return Response(status=401)
+    def get(self, request, user_id=None):
+        user = request.user
+        if user_id:
+            try:
+                user = FriendList.objects.get(user=user, friend__user_id=user_id)
+            except FriendList.DoesNotExist:
+                return Response({'error': 'No relationships'}, status=403)
 
-        songs = Song.objects.filter(user__user_id=user_id).all().order_by('-created_at')
+        songs = Song.objects.filter(users=user).all().order_by('-created_at')
         serializer = SongListSerializer(songs, many=True)
-        return Response({request.user.username: {'songs': serializer.data}})
+        return Response({request.user.user_id: {'songs': serializer.data}})
 
     def post(self, request, user_id=None):
         user = request.user
         if user_id:
-            return Response(status=401)
+            try:
+                user = FriendList.objects.get(user=user, friend__user_id=user_id)
+            except FriendList.DoesNotExist:
+                return Response({'error': 'No relationships with this user'}, status=403)
 
         user_location = UserLocation.objects.filter(user=user).order_by('-created_at').first()
         if user_location.need_proxy:
-            return Response(status=407)
+            return Response({'error': 'Proxy Authentication Required'}, status=407)
 
-        vk_session = VkApi(login=user.username, password=user.dump_password, config_filename='config.json')
-        vk_session.auth()
-        vk_session.get_api()
-        vk_audio = audio.VkAudio(vk_session)
-        audio_list = vk_audio.get(owner_id=user.user_id)
+        audio_list = get_vk_audio(user).get(owner_id=user.user_id)
         songs_added = {
             'user': user.user_id,
             'amount': 0,
@@ -47,7 +54,7 @@ class UserSongListAPIView(APIView):
         for track in audio_list:
             try:
                 try:
-                    song = Song.objects.filter(song_id=track.get('id')).first()
+                    song = Song.objects.get(song_id=track.get('id'))
                 except Song.DoesNotExist:
                     song = Song(
                         song_id=track.get('id'),
@@ -56,6 +63,7 @@ class UserSongListAPIView(APIView):
                         duration=track.get('duration'),
                         download=track.get('url'),
                     )
+                    song.save()
                 song.users.add(user)
                 song.save()
 

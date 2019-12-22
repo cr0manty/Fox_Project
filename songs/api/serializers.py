@@ -4,9 +4,8 @@ from songs.models import Song
 
 
 class SongListSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(many=False, slug_field="username", read_only=True)
 
     class Meta:
         model = Song
-        fields = ('artist', 'name', 'duration',
-                  'user', 'download')
+        fields = ('song_id', 'artist', 'name',
+                  'duration', 'download', 'posted_at')
