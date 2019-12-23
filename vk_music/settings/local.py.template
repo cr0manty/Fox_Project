@@ -11,7 +11,7 @@ DATABASES = {
         'NAME': 'vk_music',
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
            'init_command': 'SET default_storage_engine=InnoDB',

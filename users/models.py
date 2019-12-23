@@ -6,7 +6,7 @@ import requests
 
 
 class User(AbstractUser):
-    user_id = models.IntegerField(unique=True, null=True)
+    user_id = models.IntegerField(unique=True)
     dump_password = models.CharField(max_length=255, null=True)
     
     def save(self, *args, **kwargs):
