@@ -8,6 +8,7 @@ import requests
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True)
     dump_password = models.CharField(max_length=255, null=True)
+    image = models.ImageField(blank=True, null=True)
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

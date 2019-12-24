@@ -6,6 +6,6 @@ from .views import UserRegistration
 urlpatterns = [
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('reg/', UserRegistration.as_view()),
-    path('songs/', include('songs.api.urls'))
+    path('songs/', include('songs.api.urls')),
+    path('users/', include('users.api.urls')),
 ]

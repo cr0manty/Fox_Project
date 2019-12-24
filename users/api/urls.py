@@ -3,7 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('info/', ),
+    path('profile/', UserAPIView.as_view()),
     path('friends/<user_id>', ),
     path('invites/',),
 ]
