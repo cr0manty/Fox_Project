@@ -6,7 +6,7 @@ import requests
 
 
 class User(AbstractUser):
-    user_id = models.IntegerField(unique=True)
+    user_id = models.IntegerField(unique=True, null=True)
     dump_password = models.CharField(max_length=255, null=True)
     image = models.ImageField(blank=True, null=True)
     

@@ -6,7 +6,7 @@ from vk_api import VkApi, audio
 
 from .serializers import SongListSerializer
 from songs.models import Song
-from users.models import UserLocation, Proxy, FriendList
+from users.models import UserLocation, Proxy, FriendList, User
 
 
 def get_vk_audio(user):
@@ -16,6 +16,7 @@ def get_vk_audio(user):
     return audio.VkAudio(vk_session)
 
 
+# test id 356189219
 class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -27,9 +28,9 @@ class UserSongListAPIView(APIView):
             except FriendList.DoesNotExist:
                 return Response({'error': 'No relationships'}, status=403)
 
-        songs = Song.objects.filter(users=user).all().order_by('-created_at')
+        songs = Song.objects.filter(users=user).all().order_by('-posted_at')
         serializer = SongListSerializer(songs, many=True)
-        return Response({request.user.user_id: {'songs': serializer.data}})
+        return Response({'songs': serializer.data})
 
     def post(self, request, user_id=None):
         user = request.user
