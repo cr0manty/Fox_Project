@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from vk_api import VkApi, audio
 
@@ -19,6 +20,7 @@ def get_vk_audio(user):
 # test id 356189219
 class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def get(self, request, user_id=None):
         user = request.user

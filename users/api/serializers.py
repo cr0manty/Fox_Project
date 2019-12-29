@@ -13,16 +13,13 @@ class FriendListSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        style={'input_type': 'password'}
-    )
     lookup_field = 'username'
 
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name',
-                  'email', 'password', 'is_staff', 'date_joined',
-                  'birth_date', 'about', 'image')
+                  'email', 'is_staff', 'date_joined',
+                  'user_id', 'dump_password', 'image')
         read_only_fields = ('id', 'is_staff', 'date_joined')
         extra_kwargs = {
             'password': {'write_only': True}
