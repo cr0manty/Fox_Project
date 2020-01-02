@@ -125,6 +125,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+
 USER_LOCATION_URL_JSON = 'http://www.trackip.net/ip?json'
 
 # Internationalization
