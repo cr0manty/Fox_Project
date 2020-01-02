@@ -49,7 +49,8 @@ class UserSongListAPIView(APIView):
         audio_list = get_vk_audio(user).get(owner_id=user.user_id)
         songs_added = {
             'user': user.user_id,
-            'amount': 0,
+            'added': 0,
+            'updated': 0,
             'songs': [
             ]
         }
@@ -59,7 +60,9 @@ class UserSongListAPIView(APIView):
                 try:
                     song = Song.objects.get(song_id=track.get('id'))
                     song.users.add(user)
+                    song.download = track['url']
                     song.save()
+                    songs_added['updated'] += 1
                 except Song.DoesNotExist:
                     song = Song.objects.create(
                         song_id=track.get('id'),
