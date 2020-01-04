@@ -30,7 +30,7 @@ class UserSongListAPIView(APIView):
             except FriendList.DoesNotExist:
                 return Response({'error': 'No relationships'}, status=403)
 
-        songs = Song.objects.filter(users=user).all().order_by('-posted_at')
+        songs = Song.objects.filter(users=user).all().order_by('song_id')
         serializer = SongListSerializer(songs, many=True)
         return Response({'songs': serializer.data})
 
@@ -78,7 +78,7 @@ class UserSongListAPIView(APIView):
                         'name': track.get('title'),
                         'duration': track.get('duration')
                     })
-                    songs_added['amount'] += 1
-            except:
-                pass
+                    songs_added['added'] += 1
+            except Exception as e:
+                print(e)
         return Response(songs_added, status=201)
