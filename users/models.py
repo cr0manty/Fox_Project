@@ -7,9 +7,13 @@ import requests
 
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True, null=True)
-    dump_password = models.CharField(max_length=255, null=True)
+    vk_login = models.CharField(max_length=255, null=True, blank=True)
+    vk_password = models.CharField(max_length=255, null=True)
     image = models.ImageField(blank=True, null=True)
-    
+
+    def vk_auth(self):
+        return bool(self.vk_login) and bool(self.vk_password)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         UserLocation.objects.create(user=self)
@@ -21,6 +25,10 @@ class UserLocation(models.Model):
     ip = models.CharField(max_length=15, null=True)
     need_proxy = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.get_location()
 
     def get_location(self):
         user_info = requests.get(settings.USER_LOCATION_URL_JSON).json()

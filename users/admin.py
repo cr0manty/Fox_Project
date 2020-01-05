@@ -4,7 +4,7 @@ from .models import User, Proxy, UserLocation, FriendList
 
 
 class UsersAdmin(admin.ModelAdmin):
-    pass
+    exclude = ('vk_password', 'vk_login')
 
 
 class UserLocationAdmin(admin.ModelAdmin):

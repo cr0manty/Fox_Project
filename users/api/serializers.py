@@ -13,11 +13,11 @@ class FriendListSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    vk_auth = serializers.ReadOnlyField()
     lookup_field = 'username'
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name',
-                  'email', 'is_staff', 'date_joined',
-                  'user_id', 'image')
-        read_only_fields = ('id', 'is_staff', 'date_joined')
+        exclude = ('vk_password', 'vk_login', 'password',
+                   'user_permissions', 'groups', 'is_active',
+                   'is_superuser')
