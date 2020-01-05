@@ -11,3 +11,6 @@ class Song(models.Model):
     duration = models.IntegerField(default=0)
     download = models.TextField(null=True, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.artist, self.name)

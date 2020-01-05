@@ -18,6 +18,9 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         UserLocation.objects.create(user=self)
 
+    def __str__(self):
+        return self.username
+
 
 class UserLocation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,6 +40,9 @@ class UserLocation(models.Model):
         
         if self.location == 'UA':
             self.need_proxy = True
+
+    def __str__(self):
+        return self.user.username
 
 
 class Proxy(models.Model):
@@ -60,3 +66,6 @@ class FriendList(models.Model):
     confirmed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return '{} friends'.format(self.user.username)
