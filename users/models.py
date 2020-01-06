@@ -12,7 +12,7 @@ class User(AbstractUser):
     image = models.ImageField(blank=True, null=True)
 
     def vk_auth(self):
-        return bool(self.vk_login) and bool(self.vk_password)
+        return bool(self.vk_login) and bool(self.vk_password) and bool(self.user_id)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

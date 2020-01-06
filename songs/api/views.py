@@ -54,9 +54,9 @@ class UserSongListAPIView(APIView):
             except FriendList.DoesNotExist:
                 return Response({'error': 'No relationships with this user'}, status=403)
 
-        user_location = UserLocation.objects.filter(user=user).order_by('-created_at').first()
-        if user_location.need_proxy:
-            return Response({'error': 'Proxy Authentication Required'}, status=407)
+        # user_location = UserLocation.objects.filter(user=user).order_by('-created_at').first()
+        # if user_location.need_proxy:
+        #     return Response({'error': 'Proxy Authentication Required'}, status=407)
 
         audio_list = get_vk_audio(user).get(owner_id=user.user_id)
         songs_added = {
