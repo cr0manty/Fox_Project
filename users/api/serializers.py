@@ -13,7 +13,6 @@ class FriendListSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     vk_auth = serializers.ReadOnlyField()
-    vk_auth_checked = serializers.ReadOnlyField()
     lookup_field = 'username'
 
     class Meta:

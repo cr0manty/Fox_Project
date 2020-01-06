@@ -31,7 +31,7 @@ class User(AbstractUser):
     def vk_auth_checked(self):
         timeout_thread = Thread(target=self._check_vk_auth, daemon=True)
         timeout_thread.start()
-        timeout_thread.join(timeout=30)
+        timeout_thread.join(timeout=10)
         self.can_use_vk = timeout_thread.isAlive()
 
     def save(self, *args, **kwargs):
