@@ -6,7 +6,6 @@ from rest_framework.authentication import TokenAuthentication
 from django.utils.timezone import now, timedelta
 
 from vk_api import VkApi, audio
-# from datetime import datetime, timedelta
 
 from .serializers import SongListSerializer
 from songs.models import Song
@@ -54,11 +53,7 @@ class UserSongListAPIView(APIView):
             except FriendList.DoesNotExist:
                 return Response({'error': 'No relationships with this user'}, status=403)
 
-        # user_location = UserLocation.objects.filter(user=user).order_by('-created_at').first()
-        # if user_location.need_proxy:
-        #     return Response({'error': 'Proxy Authentication Required'}, status=407)
-
-        audio_list = get_vk_audio(user).get(owner_id=user.user_id)
+        audio_list = get_vk_audio(user).get(owner_id=user_id)
         songs_added = {
             'user': user.id,
             'added': 0,
@@ -73,6 +68,7 @@ class UserSongListAPIView(APIView):
                     song = Song.objects.get(song_id=track.get('id'))
                     song.users.add(user)
                     song.download = track['url']
+                    song.updated_at = now()
                     song.save()
                     songs_added['updated'] += 1
                 except Song.DoesNotExist:
@@ -89,7 +85,7 @@ class UserSongListAPIView(APIView):
             except Exception as e:
                 print(e)
 
-        serializer = SongListSerializer(Song.objects.filter(posted_at__gte=now() - timedelta(minutes=7),
+        serializer = SongListSerializer(Song.objects.filter(posted_at__gte=now() - timedelta(minutes=5),
                                                             users=user).all().order_by('song_id'), many=True)
         songs_added.update({'songs': serializer.data})
         return Response(songs_added, status=201)

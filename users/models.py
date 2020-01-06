@@ -1,22 +1,43 @@
+import requests
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
-import requests
+from threading import Thread
+from vk_api import VkApi
 
 
 class User(AbstractUser):
-    user_id = models.IntegerField(unique=True, null=True)
+    user_id = models.IntegerField(unique=True, null=True, blank=True)
     vk_login = models.CharField(max_length=255, null=True, blank=True)
     vk_password = models.CharField(max_length=255, null=True)
+    can_use_vk = models.BooleanField(default=False)
     image = models.ImageField(blank=True, null=True)
+    friends = models.ManyToManyField('self', blank=True, related_name='friends')
 
     def vk_auth(self):
-        return bool(self.vk_login) and bool(self.vk_password) and bool(self.user_id)
+        return bool(self.vk_login) and bool(self.vk_password)
+
+    def _check_vk_auth(self):
+        try:
+            login = self.vk_login if self.vk_login else self.username
+            vk_session = VkApi(login=login, password=self.vk_password, config_filename='config.json')
+            vk_session.auth()
+            self.user_id = vk_session.method('users.get')[0]['id']
+        except requests.exceptions.ConnectionError as e:
+            print(e)
+
+    def vk_auth_checked(self):
+        timeout_thread = Thread(target=self._check_vk_auth, daemon=True)
+        timeout_thread.start()
+        timeout_thread.join(timeout=30)
+        self.can_use_vk = timeout_thread.isAlive()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         UserLocation.objects.create(user=self)
+        self.vk_auth_checked()
 
     def __str__(self):
         return self.username

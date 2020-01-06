@@ -6,22 +6,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
-from vk_api import VkApi
-from threading import Thread
-from requests.exceptions import ConnectionError
-
 from .serializers import UserSerializer
 
 User = get_user_model()
-
-
-def vk_auth(user):
-    try:
-        login = user.vk_login if user.vk_login else user.username
-        vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
-        vk_session.auth()
-    except ConnectionError as e:
-        print(e)
 
 
 class CheckAuth(APIView):
@@ -29,14 +16,6 @@ class CheckAuth(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
-        return Response(status=200)
-
-    def put(self, request):
-        timeout_thread = Thread(target=vk_auth, args=(request.user,))
-        timeout_thread.start()
-        timeout_thread.join(timeout=15)
-        if timeout_thread.isAlive():
-            return Response(status=401)
         return Response(status=200)
 
 
