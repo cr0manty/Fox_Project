@@ -53,8 +53,8 @@ class UserLocation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         self.get_location()
+        super().save(*args, **kwargs)
 
     def get_location(self):
         user_info = requests.get(settings.USER_LOCATION_URL_JSON).json()
