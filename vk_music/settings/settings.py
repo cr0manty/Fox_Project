@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'api',
     'users',
     'songs',
-
+    'core'
 ]
 
 MIDDLEWARE = [

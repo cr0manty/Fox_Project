@@ -7,6 +7,8 @@ from django.contrib.auth.models import AbstractUser
 from threading import Thread
 from vk_api import VkApi
 
+from core.models import Log
+
 
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True, null=True, blank=True)
@@ -26,7 +28,7 @@ class User(AbstractUser):
             vk_session.auth()
             self.user_id = vk_session.method('users.get')[0]['id']
         except requests.exceptions.ConnectionError as e:
-            print(e)
+            Log.objects.create(exception=str(e))
 
     def vk_auth_checked(self):
         timeout_thread = Thread(target=self._check_vk_auth, daemon=True)

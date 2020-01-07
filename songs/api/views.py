@@ -12,6 +12,7 @@ from songs.models import Song
 from users.models import UserLocation, Proxy, FriendList
 from requests.exceptions import ConnectionError
 
+from core.models import Log
 
 def get_vk_audio(user):
     try:
@@ -21,7 +22,7 @@ def get_vk_audio(user):
         vk_session.get_api()
         return audio.VkAudio(vk_session)
     except ConnectionError as e:
-        print(e)
+        Log.objects.create(exception=str(e))
 
 
 # test id 356189219
@@ -35,7 +36,9 @@ class UserSongListAPIView(APIView):
             try:
                 user = FriendList.objects.get(user=user, friend__user_id=user_id)
             except FriendList.DoesNotExist:
-                return Response({'error': 'No relationships'}, status=403)
+                e = 'No relationships with {}'.format(user_id)
+                Log.objects.create(exception=e)
+                return Response({'error': e}, status=403)
 
         songs = Song.objects.filter(users=user).all().order_by('song_id')
         serializer = SongListSerializer(songs, many=True)
@@ -51,9 +54,18 @@ class UserSongListAPIView(APIView):
             try:
                 user = FriendList.objects.get(user=user, friend__user_id=user_id)
             except FriendList.DoesNotExist:
-                return Response({'error': 'No relationships with this user'}, status=403)
+                e = 'No relationships with {}'.format(user_id)
+                Log.objects.create(exception=e)
+                return Response({'error': e}, status=403)
 
-        audio_list = get_vk_audio(user).get(owner_id=user_id)
+        try:
+            audio = get_vk_audio(user)
+            audio_list = audio.get(owner_id=user_id)
+        except Exception as e:
+            err_text = 'Cant connect to vk server'
+            Log.objects.create(exception=str(e), additional_text=err_text)
+            return Response(err_text, status=500)
+
         songs_added = {
             'user': user.id,
             'added': 0,
@@ -83,7 +95,7 @@ class UserSongListAPIView(APIView):
                     song.save()
                     songs_added['added'] += 1
             except Exception as e:
-                print(e)
+                Log.objects.create(exception=str(e))
 
         serializer = SongListSerializer(Song.objects.filter(posted_at__gte=now() - timedelta(minutes=5),
                                                             users=user).all().order_by('song_id'), many=True)
