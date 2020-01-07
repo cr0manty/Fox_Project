@@ -14,18 +14,15 @@ from requests.exceptions import ConnectionError
 
 from core.models import Log
 
+
 def get_vk_audio(user):
-    try:
-        login = user.vk_login if user.vk_login else user.username
-        vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
-        vk_session.auth()
-        vk_session.get_api()
-        return audio.VkAudio(vk_session)
-    except ConnectionError as e:
-        Log.objects.create(exception=str(e))
+    login = user.vk_login if user.vk_login else user.username
+    vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
+    vk_session.auth()
+    vk_session.get_api()
+    return audio.VkAudio(vk_session), vk_session.method('users.get')[0]['id']
 
 
-# test id 356189219
 class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
@@ -59,8 +56,9 @@ class UserSongListAPIView(APIView):
                 return Response({'error': e}, status=403)
 
         try:
-            audio = get_vk_audio(user)
+            audio, user_id = get_vk_audio(user)
             audio_list = audio.get(owner_id=user_id)
+            user.set_vk_info(user_id)
         except Exception as e:
             err_text = 'Cant connect to vk server'
             Log.objects.create(exception=str(e), additional_text=err_text)

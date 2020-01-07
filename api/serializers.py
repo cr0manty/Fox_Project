@@ -7,4 +7,4 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         exclude = ('vk_password', 'vk_login', 'password',
                    'user_permissions', 'groups', 'is_active',
-                   'is_superuser', 'friends')
+                   'is_superuser', 'last_login')

@@ -38,6 +38,10 @@ class UserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+    def post(self, request):
+        request.user.update(data=request.data)
+        return Response(status=200)

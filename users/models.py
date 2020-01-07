@@ -16,7 +16,6 @@ class User(AbstractUser):
     vk_password = models.CharField(max_length=255, null=True)
     can_use_vk = models.BooleanField(default=False)
     image = models.ImageField(blank=True, null=True)
-    friends = models.ManyToManyField('self', blank=True, related_name='friends')
 
     def vk_auth(self):
         return bool(self.vk_login) and bool(self.vk_password)
@@ -41,6 +40,21 @@ class User(AbstractUser):
         UserLocation.objects.create(user=self)
         self.vk_auth_checked()
 
+    def set_vk_info(self, user_id):
+        self.vk_login = self.username
+        self.can_use_vk = True
+        self.user_id = user_id
+        super().save()
+
+    def update(self, data):
+        self.username = data.get('username', self.username)
+        self.first_name = data.get('first_name', self.first_name)
+        self.last_name = data.get('last_name', self.last_name)
+        self.email = data.get('email', self.email)
+        self.user_id = data.get('user_id', self.user_id)
+        self.image = data.get('image', self.image)
+        super().save()
+
     def __str__(self):
         return self.username
 
@@ -60,7 +74,7 @@ class UserLocation(models.Model):
         user_info = requests.get(settings.USER_LOCATION_URL_JSON).json()
         self.location = user_info.get('Country', None)
         self.ip = user_info.get('IP', None)
-        
+
         if self.location == 'UA':
             self.need_proxy = True
 
@@ -74,10 +88,10 @@ class Proxy(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     is_valid = models.BooleanField(default=False)
     checked = models.BooleanField(default=False)
-    
+
     def check_for_valid(self):
         return self.checked
-    
+
     def save(self, *args, **kwargs):
         self.check_for_valid()
         super().save(*args, **kwargs)
@@ -88,7 +102,7 @@ class FriendList(models.Model):
     friend = models.ForeignKey(User, related_name='user_friend', on_delete=models.CASCADE)
     confirmed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    confirmed_at = models.DateTimeField(null=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return '{} friends'.format(self.user.username)
