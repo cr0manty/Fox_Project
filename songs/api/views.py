@@ -9,7 +9,7 @@ from vk_api import VkApi, audio
 
 from .serializers import SongListSerializer
 from songs.models import Song
-from users.models import UserLocation, Proxy, FriendList
+from users.models import UserLocation, Proxy, Relationship
 from requests.exceptions import ConnectionError
 
 from core.models import Log
@@ -31,8 +31,8 @@ class UserSongListAPIView(APIView):
         user = request.user
         if user_id:
             try:
-                user = FriendList.objects.get(user=user, friend__user_id=user_id)
-            except FriendList.DoesNotExist:
+                user = Relationship.objects.get(user=user, friend__user_id=user_id)
+            except Relationship.DoesNotExist:
                 e = 'No relationships with {}'.format(user_id)
                 Log.objects.create(exception=e)
                 return Response({'error': e}, status=403)
@@ -49,8 +49,8 @@ class UserSongListAPIView(APIView):
         user = request.user
         if user_id:
             try:
-                user = FriendList.objects.get(user=user, friend__user_id=user_id)
-            except FriendList.DoesNotExist:
+                user = Relationship.objects.get(user=user, friend__user_id=user_id)
+            except Relationship.DoesNotExist:
                 e = 'No relationships with {}'.format(user_id)
                 Log.objects.create(exception=e)
                 return Response({'error': e}, status=403)

@@ -5,6 +5,9 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from threading import Thread
+
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from vk_api import VkApi
 
 from core.models import Log
@@ -25,15 +28,22 @@ class User(AbstractUser):
             login = self.vk_login if self.vk_login else self.username
             vk_session = VkApi(login=login, password=self.vk_password, config_filename='config.json')
             vk_session.auth()
-            self.user_id = vk_session.method('users.get')[0]['id']
+            if not self.can_use_vk or not self.vk_auth():
+                self.user_id = vk_session.method('users.get')[0]['id']
+                self.vk_login = login
+                self.can_use_vk = True
+                super().save()
+            return True
         except requests.exceptions.ConnectionError as e:
             Log.objects.create(exception=str(e))
+            return False
 
     def vk_auth_checked(self):
         timeout_thread = Thread(target=self._check_vk_auth, daemon=True)
         timeout_thread.start()
         timeout_thread.join(timeout=10)
         self.can_use_vk = timeout_thread.isAlive()
+        super().save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -53,6 +63,8 @@ class User(AbstractUser):
         self.email = data.get('email', self.email)
         self.user_id = data.get('user_id', self.user_id)
         self.image = data.get('image', self.image)
+        self.vk_password = data.get('vk_password', self.vk_password)
+        self.vk_login = data.get('vk_login', self.vk_login)
         super().save()
 
     def __str__(self):
@@ -97,12 +109,21 @@ class Proxy(models.Model):
         super().save(*args, **kwargs)
 
 
-class FriendList(models.Model):
-    user = models.ForeignKey(User, related_name='main_user', on_delete=models.CASCADE)
-    friend = models.ForeignKey(User, related_name='user_friend', on_delete=models.CASCADE)
-    confirmed = models.BooleanField(default=False)
+class RelationshipStatus(models.Model):
+    code = models.IntegerField()
+    name = models.CharField(max_length=32)
+
+    def __str__(self):
+        return self.name
+
+
+class Relationship(models.Model):
+    from_user = models.ForeignKey(User, related_name='main_user', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='user_friend', on_delete=models.CASCADE)
+    status = models.ForeignKey(RelationshipStatus, related_name='status',
+                               on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} friends'.format(self.user.username)
+        return '{} -> {} - {}'.format(self.from_user.username, self.to_user.username, self.status.name)
