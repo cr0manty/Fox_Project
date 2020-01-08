@@ -24,7 +24,7 @@ class RelationshipsAPIView(APIView):
             else:
                 relationship = Relationship.objects.filter(from_user=request.user).all()
                 serializer = FriendListSerializer(relationship, many=True)
-            return Response(serializer.data, status=200)
+            return Response({'result': serializer.data}, status=200)
         except Relationship.DoesNotExist:
             return Response({'error': 'Relationships not found'}, status=404)
 
