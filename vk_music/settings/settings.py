@@ -99,6 +99,8 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'users.User'
 
+CELERY_BROKER_URL = 'amqp://localhost'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -136,7 +138,7 @@ USER_LOCATION_URL_JSON = 'http://www.trackip.net/ip?json'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 

@@ -1,16 +1,12 @@
 import requests
 
 from django.db import models
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from threading import Thread
 
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from vk_api import VkApi
-
 from core.models import Log
+from core.utils import get_vk_auth, get_vk_user_data
 
 
 class User(AbstractUser):
@@ -25,12 +21,9 @@ class User(AbstractUser):
 
     def _check_vk_auth(self):
         try:
-            login = self.vk_login if self.vk_login else self.username
-            vk_session = VkApi(login=login, password=self.vk_password, config_filename='config.json')
-            vk_session.auth()
+            vk_session = get_vk_auth(self)
             if not self.can_use_vk or not self.vk_auth():
-                self.user_id = vk_session.method('users.get')[0]['id']
-                self.vk_login = login
+                self.user_id = get_vk_user_data(vk_session)['id']
                 self.can_use_vk = True
                 super().save()
             return True
@@ -47,7 +40,6 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        UserLocation.objects.create(user=self)
         self.vk_auth_checked()
 
     def set_vk_info(self, user_id):
@@ -65,33 +57,15 @@ class User(AbstractUser):
         self.image = data.get('image', self.image)
         self.vk_password = data.get('vk_password', self.vk_password)
         self.vk_login = data.get('vk_login', self.vk_login)
+        if data.get('set_vk', None):
+            vk_session = get_vk_auth(self)
+            user_data = get_vk_user_data(vk_session)
+            self.first_name = user_data.get('first_name', self.first_name)
+            self.last_name = user_data.get('last_name', self.last_name)
         super().save()
 
     def __str__(self):
         return self.username
-
-
-class UserLocation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=10, null=True)
-    ip = models.CharField(max_length=15, null=True)
-    need_proxy = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        self.get_location()
-        super().save(*args, **kwargs)
-
-    def get_location(self):
-        user_info = requests.get(settings.USER_LOCATION_URL_JSON).json()
-        self.location = user_info.get('Country', None)
-        self.ip = user_info.get('IP', None)
-
-        if self.location == 'UA':
-            self.need_proxy = True
-
-    def __str__(self):
-        return self.user.username
 
 
 class Proxy(models.Model):

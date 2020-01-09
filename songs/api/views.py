@@ -5,22 +5,14 @@ from rest_framework.authentication import TokenAuthentication
 
 from django.utils.timezone import now, timedelta
 
-from vk_api import VkApi, audio
 
 from .serializers import SongListSerializer
 from songs.models import Song
-from users.models import UserLocation, Proxy, Relationship
-from requests.exceptions import ConnectionError
+from users.models import Relationship
+
 
 from core.models import Log
-
-
-def get_vk_audio(user):
-    login = user.vk_login if user.vk_login else user.username
-    vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
-    vk_session.auth()
-    vk_session.get_api()
-    return audio.VkAudio(vk_session), vk_session.method('users.get')[0]['id']
+from core.utils import get_vk_auth, get_vk_songs, get_vk_user_data
 
 
 class UserSongListAPIView(APIView):
@@ -56,9 +48,9 @@ class UserSongListAPIView(APIView):
                 return Response({'error': e}, status=403)
 
         try:
-            audio, user_id = get_vk_audio(user)
-            audio_list = audio.get(owner_id=user_id)
-            user.set_vk_info(user_id)
+            vk_session = get_vk_auth(user)
+            audio_list = get_vk_songs(vk_session)
+            user.set_vk_info(get_vk_user_data(vk_session)['id'])
         except Exception as e:
             err_text = 'Cant connect to vk server'
             Log.objects.create(exception=str(e), additional_text=err_text)
