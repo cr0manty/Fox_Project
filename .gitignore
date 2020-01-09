@@ -1,5 +1,6 @@
 .idea/
 venv/
+media/
 
 local.py
 config.json

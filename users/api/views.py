@@ -8,7 +8,6 @@ from django.utils.timezone import now
 
 from users.models import User, Relationship, RelationshipStatus
 from .serializers import UserSerializer, FriendListSerializer
-from core.models import Log
 
 
 class RelationshipsAPIView(APIView):
@@ -17,12 +16,13 @@ class RelationshipsAPIView(APIView):
 
     def get(self, request):
         user_id = request.data.get('user_id', None)
+        query = Q(Q(from_user=request.user) & ~Q(status__code=2))
         try:
             if user_id:
-                relationship = Relationship.objects.get(from_user=request.user, to_user_id=user_id)
+                relationship = Relationship.objects.get(query & Q(to_user_id=user_id))
                 serializer = FriendListSerializer(relationship)
             else:
-                relationship = Relationship.objects.filter(from_user=request.user).all()
+                relationship = Relationship.objects.filter(query).order_by('-status__code').all()
                 serializer = FriendListSerializer(relationship, many=True)
             return Response({'result': serializer.data}, status=200)
         except Relationship.DoesNotExist:

@@ -39,4 +39,4 @@ def update_user_songs(user):
                 song.users.add(user)
                 song.save()
         except Exception as e:
-            Log.objects.create(exception=str(e))
+            Log.objects.create(exception=str(e), from_user=user.username)

@@ -26,7 +26,7 @@ class UserSongListAPIView(APIView):
                 user = Relationship.objects.get(user=user, friend__user_id=user_id)
             except Relationship.DoesNotExist:
                 e = 'No relationships with {}'.format(user_id)
-                Log.objects.create(exception=e)
+                Log.objects.create(exception=e, from_user=user.username)
                 return Response({'error': e}, status=403)
 
         songs = Song.objects.filter(users=user).all().order_by('song_id')
@@ -44,7 +44,7 @@ class UserSongListAPIView(APIView):
                 user = Relationship.objects.get(user=user, friend__user_id=user_id)
             except Relationship.DoesNotExist:
                 e = 'No relationships with {}'.format(user_id)
-                Log.objects.create(exception=e)
+                Log.objects.create(exception=e, from_user=user.username)
                 return Response({'error': e}, status=403)
 
         try:
@@ -53,7 +53,7 @@ class UserSongListAPIView(APIView):
             user.set_vk_info(get_vk_user_data(vk_session)['id'])
         except Exception as e:
             err_text = 'Cant connect to vk server'
-            Log.objects.create(exception=str(e), additional_text=err_text)
+            Log.objects.create(exception=str(e), additional_text=err_text, from_user=user.username)
             return Response(err_text, status=500)
 
         songs_added = {
@@ -85,7 +85,7 @@ class UserSongListAPIView(APIView):
                     song.save()
                     songs_added['added'] += 1
             except Exception as e:
-                Log.objects.create(exception=str(e))
+                Log.objects.create(exception=str(e), from_user=user.username)
 
         serializer = SongListSerializer(Song.objects.filter(posted_at__gte=now() - timedelta(minutes=5),
                                                             users=user).all().order_by('song_id'), many=True)
