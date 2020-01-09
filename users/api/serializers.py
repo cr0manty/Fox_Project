@@ -3,17 +3,22 @@ from rest_framework import serializers
 from users.models import User, Relationship
 
 
+class FriendListUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name',
+                  'last_name', 'image', 'is_staff')
+
+
 class FriendListSerializer(serializers.ModelSerializer):
-    from_user = serializers.SlugRelatedField(many=False, slug_field="username", read_only=True)
-    from_user_id = serializers.SlugRelatedField(many=False, slug_field="id", read_only=True)
-    to_user = serializers.SlugRelatedField(many=False, slug_field="username", read_only=True)
-    to_user_id = serializers.SlugRelatedField(many=False, slug_field="id", read_only=True)
+    from_user = FriendListUserSerializer(many=False, read_only=True)
+    to_user = FriendListUserSerializer(many=False, read_only=True)
     status = serializers.SlugRelatedField(many=False, slug_field="code", read_only=True)
 
     class Meta:
         model = Relationship
-        fields = ('from_user', 'from_user_id', 'to_user', 'to_user_id',
-                  'status', 'created_at', 'confirmed_at')
+        fields = ('from_user', 'to_user', 'status',
+                  'created_at', 'confirmed_at')
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -9,6 +11,10 @@ from rest_framework.authentication import TokenAuthentication
 from .serializers import UserSerializer
 
 User = get_user_model()
+
+
+def app_version(request):
+    return HttpResponse(settings.APP_VERSION, status=200)
 
 
 class CheckAuth(APIView):

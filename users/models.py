@@ -118,8 +118,8 @@ class RelationshipStatus(models.Model):
 
 
 class Relationship(models.Model):
-    from_user = models.ForeignKey(User, related_name='main_user', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User, related_name='user_friend', on_delete=models.CASCADE)
+    from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE)
     status = models.ForeignKey(RelationshipStatus, related_name='status',
                                on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
