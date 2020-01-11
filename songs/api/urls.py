@@ -3,6 +3,5 @@ from .views import *
 
 
 urlpatterns = [
-    path('list/', UserSongListAPIView.as_view(), name='song_list_url'),
-    path('friend_songs/<user_id>', UserSongListAPIView.as_view(), name='friend_song_list_url')
+    path('info/', UserSongListAPIView.as_view(), name='song_list_url'),
 ]

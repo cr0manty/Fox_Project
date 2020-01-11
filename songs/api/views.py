@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from django.utils.timezone import now, timedelta
+from django.db.models import Q
 
 
 from .serializers import SongListSerializer
@@ -19,17 +20,24 @@ class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def get(self, request, user_id=None):
+    def get(self, request):
         user = request.user
+        user_id = request.GET.get('user_id', None)
+        song_id = request.GET.get('song_id', None)
+
         if user_id:
             try:
-                user = Relationship.objects.get(user=user, friend__user_id=user_id)
+                user = Relationship.objects.get(from_user=user, to_user__id=user_id)
             except Relationship.DoesNotExist:
-                e = 'No relationships with {}'.format(user_id)
+                e = 'No relationships with this user'
                 Log.objects.create(exception=e, from_user=user.username)
                 return Response({'error': e}, status=403)
 
-        songs = Song.objects.filter(users=user).all().order_by('song_id')
+        query = Q(users=user)
+        if song_id:
+            query &= Q(song_id=song_id)
+
+        songs = Song.objects.filter(query).all().order_by('song_id')
         serializer = SongListSerializer(songs, many=True)
         return Response({
             'user': user.id,
@@ -37,16 +45,8 @@ class UserSongListAPIView(APIView):
             'songs': serializer.data
         })
 
-    def post(self, request, user_id=None):
+    def post(self, request):
         user = request.user
-        if user_id:
-            try:
-                user = Relationship.objects.get(user=user, friend__user_id=user_id)
-            except Relationship.DoesNotExist:
-                e = 'No relationships with {}'.format(user_id)
-                Log.objects.create(exception=e, from_user=user.username)
-                return Response({'error': e}, status=403)
-
         try:
             vk_session = get_vk_auth(user)
             audio_list = get_vk_songs(vk_session)
