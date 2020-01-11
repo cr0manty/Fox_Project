@@ -15,7 +15,7 @@ class RelationshipsAPIView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
-        user_id = request.data.get('user_id', None)
+        user_id = int(request.data.get('user_id', 0))
         query = Q(Q(from_user=request.user) & ~Q(status__code=2))
         try:
             if user_id:
@@ -29,7 +29,7 @@ class RelationshipsAPIView(APIView):
             return Response({'error': 'Relationships not found'}, status=404)
 
     def put(self, request):
-        user_id = request.data.get('user_id', None)
+        user_id = int(request.data.get('user_id', 0))
         status = request.data.get('status', None)
 
         try:
@@ -78,8 +78,13 @@ class UserAPIView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        user_id = int(request.GET.get('user_id', 0))
+        try:
+            user = User.objects.get(id=user_id) if user_id else request.user
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response({'error': "User doesn't exist"}, status=404)
 
     def post(self, request):
         request.user.update(data=request.data)

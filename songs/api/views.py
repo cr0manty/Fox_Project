@@ -22,8 +22,8 @@ class UserSongListAPIView(APIView):
 
     def get(self, request):
         user = request.user
-        user_id = request.GET.get('user_id', None)
-        song_id = request.GET.get('song_id', None)
+        user_id = int(request.GET.get('user_id', 0))
+        song_id = int(request.GET.get('song_id', 0))
 
         if user_id:
             try:
