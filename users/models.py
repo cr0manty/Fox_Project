@@ -12,7 +12,7 @@ class User(AbstractUser):
     vk_login = models.CharField(max_length=255, null=True, blank=True)
     vk_password = models.CharField(max_length=255, null=True)
     can_use_vk = models.BooleanField(default=False)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(upload_to='user_image', default='user-default.jpg')
 
     def vk_auth(self):
         return bool(self.vk_login) and bool(self.vk_password)

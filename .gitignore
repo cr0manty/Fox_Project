@@ -1,6 +1,6 @@
 .idea/
 venv/
-media/
+media/user_image/
 
 local.py
 config.json
