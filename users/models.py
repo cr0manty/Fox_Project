@@ -19,7 +19,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.image.name.startswith('http'):
-            name = self.image.name[self.image.name.rfind('/')+1:]
+            name = self.image.name[self.image.name.rfind('/') + 1:]
             img = urllib.request.urlopen(self.image.name)
             self.image.save(name, img, save=True)
         super().save(*args, **kwargs)
@@ -38,11 +38,14 @@ class User(AbstractUser):
         self.image = data.get('image', self.image)
         self.vk_password = data.get('vk_password', self.vk_password)
         self.vk_login = data.get('vk_login', self.vk_login)
-        if data.get('set_vk', None) and self.vk_auth():
+        if data.get('vk_password', None) or data.get('vk_login', None):
+            self.can_use_vk = False
+        if data.get('set_vk', None):
             vk_session = get_vk_auth(self)
             user_data = get_vk_user_data(vk_session)
             self.first_name = user_data.get('first_name', self.first_name)
             self.last_name = user_data.get('last_name', self.last_name)
+            self.can_use_vk = True
         self.save()
 
     def __str__(self):

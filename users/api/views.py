@@ -88,4 +88,4 @@ class UserAPIView(APIView):
 
     def post(self, request):
         request.user.update(data=request.data)
-        return Response('Updated', status=200)
+        return Response('Updated', status=201)
