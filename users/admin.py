@@ -4,8 +4,7 @@ from .models import User, Proxy, Relationship, RelationshipStatus
 
 
 class UsersAdmin(admin.ModelAdmin):
-    exclude = ('vk_password', 'vk_login',
-               'is_active', 'last_login')
+    exclude = ('vk_password', 'is_active', 'last_login')
 
 
 class RelationshipAdmin(admin.ModelAdmin):

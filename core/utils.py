@@ -2,7 +2,7 @@ from vk_api import VkApi, audio
 
 
 def get_vk_auth(user):
-    login = user.vk_login if user.vk_login else user.username
+    login = user.username
     vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
     vk_session.auth()
     vk_session.get_api()

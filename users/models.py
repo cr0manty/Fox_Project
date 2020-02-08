@@ -4,18 +4,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 from core.models import Log
-from core.utils import get_vk_auth, get_vk_user_data
 
 
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True, null=True, blank=True)
-    vk_login = models.CharField(max_length=255, null=True, blank=True)
     vk_password = models.CharField(max_length=255, null=True)
     can_use_vk = models.BooleanField(default=False)
     image = models.ImageField(upload_to='user_image', default='user-default.jpg')
-
-    def vk_auth(self):
-        return bool(self.vk_login) and bool(self.vk_password)
 
     def save(self, *args, **kwargs):
         if self.image.name.startswith('http'):
@@ -25,27 +20,26 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
     def set_vk_info(self, user_id):
-        self.vk_login = self.username if not self.vk_login else self.username
         self.can_use_vk = True
         self.user_id = user_id
         super().save()
 
     def update(self, data):
-        self.first_name = data.get('first_name', self.first_name)
-        self.last_name = data.get('last_name', self.last_name)
-        self.email = data.get('email', self.email)
-        self.user_id = data.get('user_id', self.user_id)
-        self.image = data.get('image', self.image)
-        self.vk_password = data.get('vk_password', self.vk_password)
-        self.vk_login = data.get('vk_login', self.vk_login)
-        if data.get('vk_password', None) or data.get('vk_login', None):
-            self.can_use_vk = False
-        if data.get('set_vk', None):
-            vk_session = get_vk_auth(self)
-            user_data = get_vk_user_data(vk_session)
-            self.first_name = user_data.get('first_name', self.first_name)
-            self.last_name = user_data.get('last_name', self.last_name)
-            self.can_use_vk = True
+        new_data = {}
+        for key, value in data.items():
+            if value:
+                new_data[key] = value
+
+        password = new_data.get('password', None)
+        if password:
+            self.vk_password = password
+            self.set_password(password)
+
+        self.first_name = new_data.get('first_name', self.first_name)
+        self.last_name = new_data.get('last_name', self.last_name)
+        self.email = new_data.get('email', self.email)
+        self.image = new_data.get('image', self.image)
+        self.username = new_data.get('username', self.username)
         self.save()
 
     def __str__(self):
