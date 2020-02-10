@@ -1,25 +1,12 @@
 from django.contrib import admin
+from authtools.admin import UserAdmin
 
-from .models import User, Proxy, Relationship, RelationshipStatus
-
-
-class UsersAdmin(admin.ModelAdmin):
-    exclude = ('vk_password', 'is_active', 'last_login')
+from .models import User
+from .forms import StaffChangeForm
 
 
-class RelationshipAdmin(admin.ModelAdmin):
-    pass
+class CustomUserAdmin(UserAdmin):
+    form = StaffChangeForm
 
 
-class RelationshipStatusAdmin(admin.ModelAdmin):
-    pass
-
-
-class ProxyAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(User, UsersAdmin)
-admin.site.register(Relationship, RelationshipAdmin)
-admin.site.register(RelationshipStatus, RelationshipStatusAdmin)
-admin.site.register(Proxy, ProxyAdmin)
+admin.site.register(User, CustomUserAdmin)
