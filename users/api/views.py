@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
@@ -8,6 +9,15 @@ from django.utils.timezone import now
 
 from users.models import User, Relationship, RelationshipStatus
 from .serializers import UserSerializer, FriendListSerializer
+
+
+class SearchUserView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return User.objects.all().exclude(id=self.request.user.id)
 
 
 class RelationshipsAPIView(APIView):
