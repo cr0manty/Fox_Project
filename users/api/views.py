@@ -16,8 +16,17 @@ class SearchUserView(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     serializer_class = UserSerializer
 
+    def get_query(self):
+        search = self.request.GET.get('search')
+        query = Q()
+
+        if search:
+            query = Q(Q(first_name__istartswith=search) | Q(
+                last_name__istartswith=search) | Q(username__istartswith=search))
+        return query
+
     def get_queryset(self):
-        return User.objects.all().exclude(id=self.request.user.id)
+        return User.objects.filter(self.get_query()).exclude(id=self.request.user.id)
 
 
 class RelationshipsAPIView(APIView):
