@@ -1,7 +1,11 @@
 from django.urls import path
 from .views import *
 
+search_song = SearchSongsView.as_view({'get': 'list'})
+friend_song = FriendsSongsView.as_view({'get': 'list'})
 
 urlpatterns = [
-    path('info/', UserSongListAPIView.as_view(), name='song_list_url'),
+    path('info/', UserSongListAPIView.as_view()),
+    path('search/', search_song),
+    path('friend-songs/', friend_song)
 ]

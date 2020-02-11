@@ -1,0 +1,26 @@
+[
+{
+    "model": "users.relationshipstatus",
+    "pk": 1,
+    "fields": {
+        "code": 0,
+        "name": "request"
+    }
+},
+{
+    "model": "users.relationshipstatus",
+    "pk": 2,
+    "fields": {
+        "code": 1,
+        "name": "friends"
+    }
+},
+{
+    "model": "users.relationshipstatus",
+    "pk": 3,
+    "fields": {
+        "code": 2,
+        "name": "block"
+    }
+}
+]

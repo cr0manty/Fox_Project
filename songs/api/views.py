@@ -1,19 +1,37 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from django.utils.timezone import now, timedelta
 from django.db.models import Q
 
-
 from .serializers import SongListSerializer
 from songs.models import Song
-from users.models import Relationship
-
 
 from core.models import Log
-from core.utils import get_vk_auth, get_vk_songs, get_vk_user_data
+from core.utils import get_vk_auth, get_vk_songs, get_vk_user_data, IsFriend
+
+
+class SearchSongsView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = SongListSerializer
+
+    def get_query(self):
+        return Q(Q(artist__istartswith=self.request.GET.get('search')) | Q(
+            name__istartswith=self.request.GET.get('search')))
+
+    def get_queryset(self):
+        return Song.objects.filter(self.get_query())
+
+
+class FriendsSongsView(SearchSongsView):
+    permission_classes = (IsAuthenticated, IsFriend)
+
+    def get_query(self):
+        return super().get_query() & Q(users=self.request.GET.get('user_id'))
 
 
 class UserSongListAPIView(APIView):
@@ -22,16 +40,7 @@ class UserSongListAPIView(APIView):
 
     def get(self, request):
         user = request.user
-        user_id = int(request.GET.get('user_id', 0))
         song_id = int(request.GET.get('song_id', 0))
-
-        if user_id:
-            try:
-                user = Relationship.objects.get(from_user=user, to_user__id=user_id)
-            except Relationship.DoesNotExist:
-                e = 'No relationships with this user'
-                Log.objects.create(exception=e, from_user=user.username)
-                return Response({'error': e}, status=403)
 
         query = Q(users=user)
         if song_id:
