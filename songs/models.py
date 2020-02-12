@@ -4,9 +4,9 @@ from users.models import User
 
 
 class Song(models.Model):
-    song_id = models.IntegerField(unique=True, null=True)
-    artist = models.CharField(max_length=255, null=True)
-    name = models.CharField(max_length=255, null=True)
+    song_id = models.IntegerField(unique=True)
+    artist = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
     users = models.ManyToManyField(User, blank=True)
     duration = models.IntegerField(default=0)
     download = models.TextField(null=True, blank=True)
