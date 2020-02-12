@@ -34,10 +34,15 @@ class RelationshipsAPIView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
-        user_id = int(request.data.get('user_id', 0))
-        query = Q(Q(from_user=request.user) & ~Q(status__code=2))
+        user_id = request.GET.get('user_id', None)
+        status_code = request.GET.get('status_code', None)
+        query = Q(from_user=request.user)
+
+        if status_code:
+            query &= Q(status__code=status_code)
+
         try:
-            if user_id:
+            if user_id is not None:
                 relationship = Relationship.objects.get(query & Q(to_user_id=user_id))
                 serializer = FriendListSerializer(relationship)
             else:
@@ -107,4 +112,8 @@ class UserAPIView(APIView):
 
     def post(self, request):
         request.user.update(data=request.data)
+        return Response('Updated', status=201)
+
+    def put(self, request):
+        request.user.set_vk_info(data=request.data)
         return Response('Updated', status=201)

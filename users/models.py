@@ -5,6 +5,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
 
 from core.models import Log
+from core.utils import get_vk_auth
 
 
 class User(AbstractUser):
@@ -22,7 +23,13 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
     def set_vk_info(self, data):
-        self.can_use_vk = True
+        self.vk_login = data.get('vk_login', self.vk_login)
+        self.vk_password = data.get('vk_password', self.vk_password)
+        try:
+            get_vk_auth(self)
+            self.can_use_vk = True
+        except Exception as e:
+            Log.objects.create(exception=str(e), additional_text="Cant't connect to vk", from_user=self.username)
         super().save()
 
     def update(self, data):
@@ -64,6 +71,10 @@ class Proxy(models.Model):
 class RelationshipStatus(models.Model):
     code = models.IntegerField()
     name = models.CharField(max_length=32)
+
+    class Meta:
+        verbose_name = 'Relationship Status'
+        verbose_name_plural = 'Relationships Statuses'
 
     def __str__(self):
         return self.name

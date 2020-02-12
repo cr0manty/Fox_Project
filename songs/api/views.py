@@ -10,8 +10,9 @@ from django.db.models import Q
 from .serializers import SongListSerializer
 from songs.models import Song
 
+from api.models import IsFriend
 from core.models import Log
-from core.utils import get_vk_auth, get_vk_songs, IsFriend
+from core.utils import get_vk_auth, get_vk_songs
 
 
 class SearchSongsView(viewsets.ModelViewSet):
