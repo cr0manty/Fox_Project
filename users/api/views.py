@@ -36,11 +36,13 @@ class RelationshipsAPIView(APIView):
     def get(self, request):
         user_id = request.GET.get('user_id', None)
         status_code = request.GET.get('status_code', None)
-        query = Q(from_user=request.user) & ~Q(status__code=3)
+        query = Q(from_user=request.user)
 
         if status_code:
-            query &= Q(status__code=status_code)
-
+            if status_code != -2:
+                query &= Q(status__code=status_code)
+        else:
+            query &= ~Q(status__code=3)
         try:
             if user_id is not None:
                 relationship = Relationship.objects.get(query & Q(to_user_id=user_id))
