@@ -66,8 +66,8 @@ class RelationshipsAPIView(APIView):
         except User.DoesNotExist:
             return Response({'error': "User not found"}, status=404)
 
-        to_user_query = Q(Q(from_user=to_user) & Q(to_user=request.user))
-        from_user_query = Q(Q(from_user=request.user) & Q(to_user=to_user))
+        to_user_query = Q(from_user=to_user) & Q(to_user=request.user)
+        from_user_query = Q(from_user=request.user) & Q(to_user=to_user)
 
         try:
             Relationship.objects.get(from_user_query)
@@ -84,11 +84,11 @@ class RelationshipsAPIView(APIView):
                         to_relationship.confirmed_at = now()
                         to_relationship.save()
                         return Response('Created', status=201)
-                    elif to_relationship.status.code == 2:
+                    elif to_relationship.status.code == 3:
                         return Response({'error': 'This user has blocked you'}, status=403)
                 except Relationship.DoesNotExist:
                     pass
-            elif rel_status == 2:
+            elif rel_status == 3:
                 try:
                     Relationship.objects.get(to_user_query).delete()
                 except Relationship.DoesNotExist:
