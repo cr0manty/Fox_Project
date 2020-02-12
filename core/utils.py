@@ -7,8 +7,7 @@ from users.models import Relationship
 
 
 def get_vk_auth(user):
-    login = user.username
-    vk_session = VkApi(login=login, password=user.vk_password, config_filename='config.json')
+    vk_session = VkApi(login=user.vk_login, password=user.vk_password, config_filename='config.json')
     vk_session.auth()
     vk_session.get_api()
     return vk_session

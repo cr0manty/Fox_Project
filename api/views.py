@@ -33,6 +33,8 @@ class UserRegistration(APIView):
             user_data = {field: data for (field, data) in request.data.items() if field in VALID_USER_FIELDS}
             if not user_data.get('vk_password', None):
                 user_data.update({'vk_password': user_data.get('password')})
+            if not user_data.get('vk_login', None):
+                user_data.update({'vk_login': user_data.get('username')})
             user = User.objects.create_user(
                 **user_data
             )

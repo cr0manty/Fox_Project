@@ -1,6 +1,7 @@
 import urllib.request
 
 from django.db import models
+from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
 
 from core.models import Log
@@ -8,6 +9,7 @@ from core.models import Log
 
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True, null=True, blank=True)
+    vk_login = models.CharField(max_length=255, null=True)
     vk_password = models.CharField(max_length=255, null=True)
     can_use_vk = models.BooleanField(default=False)
     image = models.ImageField(upload_to='user_image', default='user-default.jpg')
@@ -19,9 +21,8 @@ class User(AbstractUser):
             self.image.save(name, img, save=True)
         super().save(*args, **kwargs)
 
-    def set_vk_info(self, user_id):
+    def set_vk_info(self, data):
         self.can_use_vk = True
-        self.user_id = user_id
         super().save()
 
     def update(self, data):
@@ -32,7 +33,6 @@ class User(AbstractUser):
 
         password = new_data.get('password', None)
         if password:
-            self.vk_password = password
             self.set_password(password)
 
         self.first_name = new_data.get('first_name', self.first_name)

@@ -4,9 +4,19 @@ from authtools.admin import UserAdmin
 from .models import User, Relationship, RelationshipStatus
 from .forms import StaffChangeForm
 
+fieldsets = UserAdmin.fieldsets
+
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    fieldsets += (
+        ('VK Data', {'fields': (
+            'user_id', 'vk_login', 'can_use_vk', 'vk_password'
+        )}),
+        ('Image', {'fields': (
+            'image',
+        )}),
+    )
     form = StaffChangeForm
 
 

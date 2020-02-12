@@ -11,7 +11,7 @@ from .serializers import SongListSerializer
 from songs.models import Song
 
 from core.models import Log
-from core.utils import get_vk_auth, get_vk_songs, get_vk_user_data, IsFriend
+from core.utils import get_vk_auth, get_vk_songs, IsFriend
 
 
 class SearchSongsView(viewsets.ModelViewSet):
@@ -36,7 +36,7 @@ class FriendsSongsView(SearchSongsView):
     permission_classes = (IsAuthenticated, IsFriend)
 
     def get_query(self):
-        user_id = self.request.GET.get('user_id')
+        user_id = self.kwargs.get('id')
         query = super().get_query()
 
         if user_id:
@@ -70,11 +70,10 @@ class UserSongListAPIView(APIView):
         try:
             vk_session = get_vk_auth(user)
             audio_list = get_vk_songs(vk_session)
-            user.set_vk_info(get_vk_user_data(vk_session)['id'])
         except Exception as e:
             err_text = 'Cant connect to vk server'
             Log.objects.create(exception=str(e), additional_text=err_text, from_user=user.username)
-            return Response(err_text, status=500)
+            return Response(err_text, status=400)
 
         songs_added = {
             'user': user.id,
