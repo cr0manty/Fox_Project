@@ -39,7 +39,7 @@ class RelationshipsAPIView(APIView):
         query = Q(from_user=request.user)
 
         if status_code:
-            if status_code != -2:
+            if status_code != 'all':
                 query &= Q(status__code=status_code)
         else:
             query &= ~Q(status__code=3)
