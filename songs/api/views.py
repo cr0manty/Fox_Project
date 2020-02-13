@@ -46,6 +46,16 @@ class FriendsSongsView(SearchSongsView):
         return query
 
 
+class RemoveSongFromUser(APIView):
+    def post(self, request, song_id):
+        try:
+            song = Song.objects.get(song_id=song_id, users=request.user)
+            song.ignore_user(request.user)
+            return Response(status=201)
+        except Song.DoesNotExist:
+            return Response(status=404)
+
+
 class UserSongListAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
@@ -88,7 +98,8 @@ class UserSongListAPIView(APIView):
             try:
                 try:
                     song = Song.objects.get(song_id=track.get('id'))
-                    song.users.add(user)
+                    if user not in song.users_ignore.all():
+                        song.users.add(user)
                     song.download = track['url']
                     song.updated_at = now()
                     song.save()
