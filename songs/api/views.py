@@ -7,6 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from django.utils.timezone import now, timedelta
 from django.db.models import Q
 
+from core.views import AmountModelViewSet
 from .serializers import SongListSerializer
 from songs.models import Song
 
@@ -34,6 +35,7 @@ class SearchSongsView(viewsets.ModelViewSet):
 
 
 class FriendsSongsView(SearchSongsView):
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsFriend)
 
     def get_query(self):
@@ -47,6 +49,9 @@ class FriendsSongsView(SearchSongsView):
 
 
 class RemoveSongFromUser(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, song_id):
         try:
             song = Song.objects.get(song_id=song_id, users=request.user)
@@ -56,27 +61,22 @@ class RemoveSongFromUser(APIView):
             return Response(status=404)
 
 
-class UserSongListAPIView(APIView):
+class UserSongListAPIView(AmountModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    queryset = Song.objects.all().order_by('song_id')
+    serializer_class = SongListSerializer
 
-    def get(self, request):
-        user = request.user
-        song_id = int(request.GET.get('song_id', 0))
+    def get_filter_query(self):
+        song_id = self.request.GET.get('song_id', None)
+        query = Q(users=self.request.user)
 
-        query = Q(users=user)
-        if song_id:
-            query &= Q(song_id=song_id)
+        if song_id is not None:
+            return query & Q(song_id=song_id)
 
-        songs = Song.objects.filter(query).all().order_by('song_id')
-        serializer = SongListSerializer(songs, many=True)
-        return Response({
-            'user': user.id,
-            'amount': len(songs),
-            'songs': serializer.data
-        })
+        return query
 
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         user = request.user
         try:
             vk_session = get_vk_auth(user)
@@ -87,11 +87,8 @@ class UserSongListAPIView(APIView):
             return Response(err_text, status=400)
 
         songs_added = {
-            'user': user.id,
             'added': 0,
             'updated': 0,
-            'songs': [
-            ]
         }
 
         for track in audio_list:
@@ -118,7 +115,4 @@ class UserSongListAPIView(APIView):
             except Exception as e:
                 Log.objects.create(exception=str(e), from_user=user.username)
 
-        serializer = SongListSerializer(Song.objects.filter(posted_at__gte=now() - timedelta(minutes=5),
-                                                            users=user).all().order_by('song_id'), many=True)
-        songs_added.update({'songs': serializer.data})
         return Response(songs_added, status=201)

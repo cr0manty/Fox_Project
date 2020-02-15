@@ -26,7 +26,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-APP_VERSION = '0.0.1'
+APP_VERSION = '0.0.2'
 
 # Application definition
 
@@ -37,9 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
     'rest_framework.authtoken',
+    'django_rq',
     'authtools',
+
     'users',
     'vk_music',
     'api',
@@ -99,8 +102,6 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'users.User'
-
-CELERY_BROKER_URL = 'amqp://localhost'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

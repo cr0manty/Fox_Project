@@ -1,3 +1,4 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
@@ -9,24 +10,6 @@ from django.utils.timezone import now
 
 from users.models import User, Relationship, RelationshipStatus
 from .serializers import UserSerializer, FriendListSerializer
-
-
-class SearchUserView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
-    serializer_class = UserSerializer
-
-    def get_query(self):
-        search = self.request.GET.get('search')
-        query = Q()
-
-        if search:
-            query = Q(Q(first_name__istartswith=search) | Q(
-                last_name__istartswith=search) | Q(username__istartswith=search))
-        return query
-
-    def get_queryset(self):
-        return User.objects.filter(self.get_query()).exclude(id=self.request.user.id)
 
 
 class RelationshipsAPIView(APIView):
@@ -99,23 +82,33 @@ class RelationshipsAPIView(APIView):
             return Response('Created', status=201)
 
 
-class UserAPIView(APIView):
+class UserAPIView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-    def get(self, request):
-        user_id = int(request.GET.get('user_id', 0))
-        try:
-            user = User.objects.get(id=user_id) if user_id else request.user
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
-        except User.DoesNotExist:
-            return Response({'error': "User doesn't exist"}, status=404)
+    def get_object(self):
+        kwargs = {'id': self.request.GET.get('user_id', self.request.user.id)}
+        queryset = self.filter_queryset(self.queryset)
+        return get_object_or_404(queryset, **kwargs)
 
-    def post(self, request):
+    def get_query(self):
+        search = self.request.GET.get('search')
+        query = Q()
+
+        if search:
+            query = Q(Q(first_name__istartswith=search) | Q(
+                last_name__istartswith=search) | Q(username__istartswith=search))
+        return query
+
+    def get_queryset(self):
+        return self.queryset.filter(self.get_query()).exclude(id=self.request.user.id)
+
+    def create(self, request, *args, **kwargs):
         request.user.update(data=request.data)
         return Response('Updated', status=201)
 
-    def put(self, request):
+    def update(self, request, *args, **kwargs):
         request.user.set_vk_info(data=request.data)
         return Response('Updated', status=201)

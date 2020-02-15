@@ -1,8 +1,8 @@
-from .settings import *
+from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2']
+ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
@@ -18,5 +18,15 @@ DATABASES = {
            'charset': 'utf8',
            'use_unicode': True,
         },
+    }
+}
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': '',
+        'DEFAULT_TIMEOUT': 360,
     }
 }
