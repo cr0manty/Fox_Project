@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'vk_music',
     'api',
     'songs',
-    'core'
+    'core',
+    'friend_messages',
 ]
 
 MIDDLEWARE = [

@@ -4,7 +4,7 @@ from users.models import User, Relationship
 
 
 class UserSerializer(serializers.ModelSerializer):
-    lookup_field = 'username'
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -12,12 +12,24 @@ class UserSerializer(serializers.ModelSerializer):
                    'user_permissions', 'groups', 'is_active',
                    'is_superuser', 'last_login')
 
+    def get_image(self, user):
+        request = self.context.get('request')
+        image = user.image.url
+        return request.build_absolute_uri(image)
+
 
 class FriendListUserSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name',
                   'last_name', 'image', 'is_staff')
+
+    def get_image(self, user):
+        request = self.context.get('request')
+        image = user.image.url
+        return request.build_absolute_uri(image)
 
 
 class FriendListSerializer(serializers.ModelSerializer):

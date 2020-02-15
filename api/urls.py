@@ -8,5 +8,6 @@ urlpatterns = [
     path('auth_check/', CheckAuth.as_view()),
     path('songs/', include('songs.api.urls')),
     path('users/', include('users.api.urls')),
+    path('messages/', include('friend_messages.urls')),
     path('current-app-version/', app_version, name='app_version')
 ]
