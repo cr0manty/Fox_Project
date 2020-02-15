@@ -36,7 +36,7 @@ class SearchSongsView(viewsets.ModelViewSet):
 
 class FriendsSongsView(SearchSongsView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsFriend)
+    permission_classes = (IsAuthenticated, )
 
     def get_query(self):
         user_id = self.kwargs.get('id')
@@ -56,6 +56,19 @@ class RemoveSongFromUser(APIView):
         try:
             song = Song.objects.get(song_id=song_id, users=request.user)
             song.ignore_user(request.user)
+            return Response(status=201)
+        except Song.DoesNotExist:
+            return Response(status=404)
+
+
+class AddSongFromUser(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, song_id):
+        try:
+            song = Song.objects.get(song_id=song_id)
+            song.users.add(request.user)
             return Response(status=201)
         except Song.DoesNotExist:
             return Response(status=404)
