@@ -97,10 +97,10 @@ class UserSongListAPIView(AmountModelViewSet):
                     song = Song.objects.get(song_id=track.get('id'))
                     if user not in song.users_ignore.all():
                         song.users.add(user)
+                        songs_added['updated'] += 1
                     song.download = track['url']
                     song.updated_at = now()
                     song.save()
-                    songs_added['updated'] += 1
                 except Song.DoesNotExist:
                     song = Song.objects.create(
                         song_id=track.get('id'),
