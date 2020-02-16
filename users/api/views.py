@@ -29,10 +29,10 @@ class RelationshipsAPIView(APIView):
         try:
             if user_id is not None:
                 relationship = Relationship.objects.get(query & Q(to_user_id=user_id))
-                serializer = FriendListSerializer(relationship)
+                serializer = FriendListSerializer(relationship, context={'request': request})
             else:
                 relationship = Relationship.objects.filter(query).order_by('-status__code').all()
-                serializer = FriendListSerializer(relationship, many=True)
+                serializer = FriendListSerializer(relationship, many=True, context={'request': request})
             return Response({'result': serializer.data}, status=200)
         except Relationship.DoesNotExist:
             return Response({'error': 'Relationships not found'}, status=404)
