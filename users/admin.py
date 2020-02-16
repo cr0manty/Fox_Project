@@ -10,6 +10,9 @@ fieldsets = UserAdmin.fieldsets
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets += (
+        ('User data', {'fields': (
+            'first_name', 'last_name'
+        )}),
         ('VK Data', {'fields': (
             'user_id', 'vk_login', 'can_use_vk', 'vk_password'
         )}),
