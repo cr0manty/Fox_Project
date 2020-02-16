@@ -96,7 +96,7 @@ class UserAPIView(viewsets.ModelViewSet):
     def get_query(self):
         search = self.request.GET.get('search', '')
 
-        if len(search) > 3:
+        if search:
             return Q(Q(first_name__istartswith=search) | Q(
                 last_name__istartswith=search) | Q(username__istartswith=search))
         return Q()

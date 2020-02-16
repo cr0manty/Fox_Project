@@ -24,7 +24,7 @@ class SearchSongsView(viewsets.ModelViewSet):
     def get_query(self):
         search = self.request.GET.get('search', '')
 
-        if len(search) > 3:
+        if search:
             return Q(Q(artist__istartswith=search) | Q(
                 name__istartswith=search))
         return Q()
