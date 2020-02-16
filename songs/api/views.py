@@ -22,13 +22,12 @@ class SearchSongsView(viewsets.ModelViewSet):
     serializer_class = SongListSerializer
 
     def get_query(self):
-        search = self.request.GET.get('search')
-        query = Q()
+        search = self.request.GET.get('search', '')
 
-        if search:
-            query = Q(Q(artist__istartswith=search) | Q(
+        if len(search) > 3:
+            return Q(Q(artist__istartswith=search) | Q(
                 name__istartswith=search))
-        return query
+        return Q()
 
     def get_queryset(self):
         return Song.objects.filter(self.get_query())
@@ -36,7 +35,7 @@ class SearchSongsView(viewsets.ModelViewSet):
 
 class FriendsSongsView(SearchSongsView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, IsFriend)
 
     def get_query(self):
         user_id = self.kwargs.get('id')
@@ -44,7 +43,6 @@ class FriendsSongsView(SearchSongsView):
 
         if user_id:
             query &= Q(users__id=user_id)
-
         return query
 
 
@@ -86,7 +84,6 @@ class UserSongListAPIView(AmountModelViewSet):
 
         if song_id is not None:
             return query & Q(song_id=song_id)
-
         return query
 
     def create(self, request, *args, **kwargs):

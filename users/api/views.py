@@ -94,13 +94,12 @@ class UserAPIView(viewsets.ModelViewSet):
         return get_object_or_404(queryset, **kwargs)
 
     def get_query(self):
-        search = self.request.GET.get('search')
-        query = Q()
+        search = self.request.GET.get('search', '')
 
-        if search:
-            query = Q(Q(first_name__istartswith=search) | Q(
+        if len(search) > 3:
+            return Q(Q(first_name__istartswith=search) | Q(
                 last_name__istartswith=search) | Q(username__istartswith=search))
-        return query
+        return Q()
 
     def get_queryset(self):
         return self.queryset.filter(self.get_query()).exclude(id=self.request.user.id)
