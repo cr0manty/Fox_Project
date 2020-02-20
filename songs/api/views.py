@@ -66,6 +66,8 @@ class AddSongFromUser(APIView):
     def post(self, request, song_id):
         try:
             song = Song.objects.get(song_id=song_id)
+            if request.user in song.users.all():
+                return Response(status=409)
             song.users.add(request.user)
             return Response(status=201)
         except Song.DoesNotExist:

@@ -35,7 +35,7 @@ class User(AbstractUser):
     def update(self, data):
         new_data = {}
         for key, value in data.items():
-            if value:
+            if value and key != 'image':
                 new_data[key] = value
 
         password = new_data.get('password', None)

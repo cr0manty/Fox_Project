@@ -10,5 +10,5 @@ urlpatterns = [
     path('search/', search_song),
     path('friend-songs/<int:id>', friend_song),
     path('delete_song/<int:song_id>', RemoveSongFromUser.as_view()),
-    path('add_song/<int:song_id>', RemoveSongFromUser.as_view()),
+    path('add_song/<int:song_id>', AddSongFromUser.as_view()),
 ]
