@@ -17,15 +17,16 @@ class RelationshipsAPIView(APIView):
     authentication_classes = (TokenAuthentication,)
 
     def get(self, request):
+        # TODO
         user_id = request.GET.get('user_id', None)
         status_code = request.GET.get('status_code', None)
-        query = Q(from_user=request.user)
+        query = Q(Q(from_user=request.user) | Q(to_user=request.user))
 
         if status_code:
             if status_code != 'all':
                 query &= Q(status__code=status_code)
         else:
-            query &= ~Q(status__code=3)
+            query &= ~Q(status__code=3) & ~Q(status__code=4)
         try:
             if user_id is not None:
                 relationship = Relationship.objects.get(query & Q(to_user_id=user_id))
@@ -42,44 +43,49 @@ class RelationshipsAPIView(APIView):
         status = request.data.get('status', None)
 
         try:
-            rel_status = RelationshipStatus.objects.get(Q(name=status) & ~Q(code=1))
-        except RelationshipStatus.DoesNotExist:
-            return Response({'error': 'Wrong status'}, status=400)
-
-        try:
             to_user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({'error': "User not found"}, status=404)
+
+        if status:
+            if status == 'block':
+                from_user_rel = Relationship.objects.get(from_user=request.user, to_user=to_user)
+                from_user_rel.status = RelationshipStatus.objects.get(name=status)
+                from_user_rel.save()
+
+                to_user_rel = Relationship.objects.get(from_user=request.user, to_user=to_user)
+                to_user_rel.status = RelationshipStatus.objects.get(name='blocked')
+                to_user_rel.save()
+                return Response('Block', status=200)
+            elif status == 'unblock':
+                Relationship.objects.get(from_user=request.user, to_user=to_user).delete()
+                Relationship.objects.get(from_user=to_user, to_user=request.user).delete()
+                return Response('Unblock', status=200)
 
         to_user_query = Q(from_user=to_user) & Q(to_user=request.user)
         from_user_query = Q(from_user=request.user) & Q(to_user=to_user)
 
         try:
-            Relationship.objects.get(from_user_query)
-            return Response({'error': 'Duplicated'}, status=409)
+            relationship = Relationship.objects.get(to_user_query)
+            if relationship.status.name == 'following':
+                relationship.status = RelationshipStatus.objects.get(name='friend')
+                relationship.save()
+
+                relationship = Relationship.objects.get(from_user_query)
+                relationship.status = RelationshipStatus.objects.get(name='friend')
+                relationship.save()
+                return Response('Success', status=200)
+            elif relationship.status.name == 'block':
+                return Response('User blocked you', status=403)
         except Relationship.DoesNotExist:
-            if rel_status == 0:
-                try:
-                    to_relationship = Relationship.objects.get(to_user_query)
-                    if to_relationship.status.code == 0:
-                        new_status = RelationshipStatus.objects.get(code=1)
-                        Relationship.objects.create(from_user=request.user, to_user=to_user,
-                                                    status=new_status, confirmed_at=now())
-                        to_relationship.status = new_status
-                        to_relationship.confirmed_at = now()
-                        to_relationship.save()
-                        return Response('Created', status=201)
-                    elif to_relationship.status.code == 3:
-                        return Response({'error': 'This user has blocked you'}, status=403)
-                except Relationship.DoesNotExist:
-                    pass
-            elif rel_status == 3:
-                try:
-                    Relationship.objects.get(to_user_query).delete()
-                except Relationship.DoesNotExist:
-                    pass
-            Relationship.objects.create(from_user=request.user, to_user=to_user, status=rel_status)
-            return Response('Created', status=201)
+            try:
+                relationship = Relationship.objects.get(from_user_query)
+                if relationship.status.name == 'follow':
+                    return Response('Duplicate', status=409)
+            except Relationship.DoesNotExist:
+                status = RelationshipStatus.objects.get(name='follow')
+                Relationship.objects.create(from_user=to_user, to_user=request.user, status=status)
+                return Response('created', status=200)
 
 
 class UserAPIView(viewsets.ModelViewSet):

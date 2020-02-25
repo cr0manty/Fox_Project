@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'api',
     'songs',
     'core',
-    'friend_messages',
 ]
 
 MIDDLEWARE = [
