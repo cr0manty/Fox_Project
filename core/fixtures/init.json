@@ -1,34 +1,42 @@
 [
-    {
-        "model": "users.relationshipstatus",
-        "pk": 1,
-        "fields": {
-            "code": 0,
-            "name": "follow"
-        }
-    },
-    {
-        "model": "users.relationshipstatus",
-        "pk": 2,
-        "fields": {
-            "code": 1,
-            "name": "following"
-        }
-    },
-    {
-        "model": "users.relationshipstatus",
-        "pk": 3,
-        "fields": {
-            "code": 2,
-            "name": "friends"
-        }
-    },
-    {
-        "model": "users.relationshipstatus",
-        "pk": 4,
-        "fields": {
-            "code": 3,
-            "name": "block"
-        }
+  {
+    "model": "users.relationshipstatus",
+    "pk": 1,
+    "fields": {
+      "code": 0,
+      "name": "follow"
     }
+  },
+  {
+    "model": "users.relationshipstatus",
+    "pk": 2,
+    "fields": {
+      "code": 2,
+      "name": "friends"
+    }
+  },
+  {
+    "model": "users.relationshipstatus",
+    "pk": 3,
+    "fields": {
+      "code": 3,
+      "name": "block"
+    }
+  },
+  {
+    "model": "users.relationshipstatus",
+    "pk": 4,
+    "fields": {
+      "code": 1,
+      "name": "following"
+    }
+  },
+  {
+    "model": "users.relationshipstatus",
+    "pk": 5,
+    "fields": {
+      "code": 4,
+      "name": "blocked"
+    }
+  }
 ]
