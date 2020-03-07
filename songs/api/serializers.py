@@ -12,4 +12,4 @@ class SongListSerializer(serializers.ModelSerializer):
 
     def get_in_my_list(self, song):
         request = self.context.get('request')
-        return request.user in song.users.all()
+        return 1 if request.user in song.users.all() else 0
