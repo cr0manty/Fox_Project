@@ -26,7 +26,7 @@ class SearchSongsView(viewsets.ModelViewSet):
 
         if search:
             return Q(Q(artist__istartswith=search) | Q(
-                name__istartswith=search))
+                title__istartswith=search))
         return Q()
 
     def get_queryset(self):
@@ -117,7 +117,7 @@ class UserSongListAPIView(AmountModelViewSet):
                     song = Song.objects.create(
                         song_id=track.get('id'),
                         artist=track.get('artist'),
-                        name=track.get('title'),
+                        title=track.get('title'),
                         duration=track.get('duration'),
                         download=track.get('url'),
                     )
