@@ -1,5 +1,8 @@
 import urllib.request
+import base64
 
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
@@ -33,20 +36,15 @@ class User(AbstractUser):
         super().save()
 
     def update(self, data):
-        new_data = {}
-        for key, value in data.items():
-            if value and key != 'image':
-                new_data[key] = value
-
-        password = new_data.get('password', None)
+        password = data.get('password', None)
         if password:
             self.set_password(password)
 
-        self.first_name = new_data.get('first_name', self.first_name)
-        self.last_name = new_data.get('last_name', self.last_name)
-        self.email = new_data.get('email', self.email)
-        self.image = new_data.get('image', self.image)
-        self.username = new_data.get('username', self.username)
+        self.first_name = data.get('first_name', self.first_name)
+        self.last_name = data.get('last_name', self.last_name)
+        self.email = data.get('email', self.email)
+        self.image = data.get('image', self.image)
+        self.username = data.get('username', self.username)
         self.save()
 
     def __str__(self):
