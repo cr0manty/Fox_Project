@@ -1,6 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
-from django.conf import settings
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,13 +6,17 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
-from .serializers import UserSerializer
+from .models import CurrentVersion
+from .serializers import UserSerializer, CurrentVersionSerializer
 
 User = get_user_model()
 
 
-def app_version(request):
-    return HttpResponse(settings.APP_VERSION, status=200)
+class AppVersion(APIView):
+    def get(self, *args, **kwargs):
+        cur_version = CurrentVersion.objects.order_by('-created_at').first()
+        serializer = CurrentVersionSerializer(cur_version)
+        return Response(serializer.data, status=200)
 
 
 class CheckAuth(APIView):
