@@ -33,7 +33,7 @@ class SongListSerializer(serializers.ModelSerializer):
                     exist = False
             cleaned_data['song_id'] = num
         
-        if not download.startswith('http') and not download.endswith('.mp3'):
+        if not download.startswith('http') or not download.endswith('.mp3'):
             raise serializers.ValidationError('Only a direct link to the file is allowed')
 
         return cleaned_data
