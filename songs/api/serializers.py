@@ -35,6 +35,15 @@ class SongListSerializer(serializers.ModelSerializer):
         if not download.startswith('http') or not download.endswith('.mp3'):
             raise serializers.ValidationError('Only a direct link to the file is allowed')
 
+        if not cleaned_data.get('title'):
+            raise serializers.ValidationError('Title filed is required')
+
+        if not cleaned_data.get('artist'):
+            raise serializers.ValidationError('Artist filed is required')
+
+        if not cleaned_data.get('duration'):
+            raise serializers.ValidationError('Duration filed is required')
+
         if Song.objects.filter(artist=cleaned_data.get('artist'), title=cleaned_data.get('title'),
                                download=download).count() > 0:
             raise serializers.ValidationError('Song already exist')
