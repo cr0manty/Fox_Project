@@ -20,8 +20,7 @@ class SongListSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         cleaned_data = super().validate(attrs)
         download = cleaned_data.get('download')
-        
-        
+
         if cleaned_data.get('song_id') is None:
             exist = True
             num = 0
@@ -32,8 +31,12 @@ class SongListSerializer(serializers.ModelSerializer):
                 except Song.DoesNotExist:
                     exist = False
             cleaned_data['song_id'] = num
-        
+
         if not download.startswith('http') or not download.endswith('.mp3'):
             raise serializers.ValidationError('Only a direct link to the file is allowed')
+
+        if Song.objects.filter(artist=cleaned_data.get('artist'), title=cleaned_data.get('title'),
+                               download=download).count() > 0:
+            raise serializers.ValidationError('Song already exist')
 
         return cleaned_data
