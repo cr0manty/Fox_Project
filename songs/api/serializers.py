@@ -40,3 +40,8 @@ class SongListSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Song already exist')
 
         return cleaned_data
+    
+    def save(self, **kwargs):
+        song = super().save(**kwargs)
+        song.users.add(self.context.get('request').user)
+        self.fields.serializer.data['in_my_list'] = 1
