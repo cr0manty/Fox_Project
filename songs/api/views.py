@@ -128,3 +128,10 @@ class UserSongListAPIView(AmountModelViewSet):
                 Log.objects.create(exception=str(e), from_user=user.username)
 
         return Response(songs_added, status=201)
+
+
+class AddNewLinkSongs(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    queryset = Song.objects.all().order_by('song_id')
+    serializer_class = SongListSerializer
