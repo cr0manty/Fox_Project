@@ -2,7 +2,7 @@ from django.utils import timezone
 from django_rq import job
 
 from core.utils import get_vk_auth, get_vk_songs
-from vk_music.shedule import scheduler
+from main.shedule import scheduler
 
 from .models import User
 from core.models import RQLog

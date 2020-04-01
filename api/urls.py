@@ -8,5 +8,6 @@ urlpatterns = [
     path('auth_check/', CheckAuth.as_view()),
     path('songs/', include('songs.api.urls')),
     path('users/', include('users.api.urls')),
-    path('current-app-version/', AppVersion.as_view(), name='app_version')
+    path('current-app-version/', AppVersion.as_view(), name='app_version'),
+    path('youtube/', include('youtube_saver.urls'))
 ]
