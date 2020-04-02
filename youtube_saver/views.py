@@ -13,6 +13,7 @@ class YoutubeApiView(ModelViewSet):
     serializer_class = YoutubePostsSerializer
     queryset = YoutubePosts.objects.all()
     permission_classes = (AllowAny,)
+    lookup_field = 'slug'
 
     def create(self, request, *args, **kwargs):
         url = self.request.GET.get('url')
@@ -27,7 +28,6 @@ class YoutubeApiView(ModelViewSet):
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print(e)
-            return Response('error', status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response('Something went wrong while trying to get data', status=status.HTTP_400_BAD_REQUEST)

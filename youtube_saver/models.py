@@ -9,7 +9,7 @@ class YoutubeFormats(models.Model):
     url = models.TextField(blank=True, null=True)
     size = models.PositiveIntegerField(default=0)
     file_type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True, default='song')
-    format = models.CharField(max_length=20, blank=True, null=True)
+    format = models.CharField(max_length=128, blank=True, null=True)
 
     class Meta:
         verbose_name = 'YoutubeFormat'

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from youtube_saver.models import YoutubeFormats, YoutubePosts
 
@@ -8,19 +9,22 @@ class YoutubeFormatsSerializer(serializers.ModelSerializer):
         model = YoutubeFormats
         fields = '__all__'
 
-    def save(self, attrs):
-        return {
-            'url': attrs['url'],
-            'size': attrs['filesize'],
-            'file_type': 'song' if attrs['fps'] is None else 'video',
-            'format': attrs['format_note'],
+    def run_validation(self, data=empty):
+        (is_empty_value, data) = self.validate_empty_values(data)
+        if is_empty_value:
+            return data
+
+        value = {
+            'url': data['url'],
+            'size': data['filesize'],
+            'file_type': 'song' if data['fps'] is None else 'video',
+            'format': data['format_note'],
         }
-    def validate(self, attrs):
-        return attrs
+        return value
 
 
 class YoutubePostsSerializer(serializers.ModelSerializer):
-    formats = YoutubeFormatsSerializer(many=True, read_only=True)
+    formats = YoutubeFormatsSerializer(many=True)
 
     class Meta:
         model = YoutubePosts
@@ -33,13 +37,11 @@ class YoutubePostsSerializer(serializers.ModelSerializer):
         attrs['slug'] = attrs['webpage_url'][index + 1:]
         return attrs
 
-    def save(self, **kwargs):
-        formats = self.initial_data.get('formats')
+    def create(self, validated_data):
+        formats = validated_data.pop('formats')
+        video, _ = YoutubePosts.objects.get_or_create(**validated_data)
 
-        obj = YoutubePosts.objects.create(**self.validated_data)
-        for format in formats:
-            format_obj = YoutubeFormatsSerializer(data=format)
-            if format_obj.is_valid():
-                format_obj.save()
-                obj.formats.add(format_obj)
-        return obj
+        for video_format in formats:
+            video_obj, _ = YoutubeFormats.objects.get_or_create(**video_format)
+            video.formats.add(video_obj)
+        return video
