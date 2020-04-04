@@ -20,7 +20,7 @@ class YoutubeApiView(ModelViewSet):
         if not url:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
-            with youtube_dl.YoutubeDL() as ydl:
+            with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
                 result = ydl.extract_info(url, download=False)
                 serializer = self.get_serializer(data=result)
                 if serializer.is_valid():

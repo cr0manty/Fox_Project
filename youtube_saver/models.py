@@ -4,7 +4,8 @@ from django.db import models
 class YoutubeFormats(models.Model):
     FILE_TYPES = (
         ('song', 'Song'),
-        ('video', 'Video')
+        ('video', 'Video'),
+        ('video_song', 'Video with Audio')
     )
     url = models.TextField(blank=True, null=True)
     size = models.PositiveIntegerField(default=0)

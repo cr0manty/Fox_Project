@@ -7,7 +7,7 @@ from youtube_saver.models import YoutubeFormats, YoutubePosts
 class YoutubeFormatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = YoutubeFormats
-        fields = '__all__'
+        exclude = ('id',)
 
     def run_validation(self, data=empty):
         (is_empty_value, data) = self.validate_empty_values(data)
@@ -20,6 +20,9 @@ class YoutubeFormatsSerializer(serializers.ModelSerializer):
             'file_type': 'song' if data['fps'] is None else 'video',
             'format': data['format_note'],
         }
+        value['file_type'] = 'video_song' if value['format'].endswith('p') and value['file_type'] == 'song' else value[
+            'file_type']
+
         return value
 
 
@@ -28,7 +31,7 @@ class YoutubePostsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = YoutubePosts
-        fields = '__all__'
+        exclude = ('id',)
 
     def validate(self, attrs):
         attrs['image'] = self.initial_data.get('thumbnail')
