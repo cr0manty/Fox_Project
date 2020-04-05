@@ -42,9 +42,13 @@ class YoutubePostsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         formats = validated_data.pop('formats')
-        video, _ = YoutubePosts.objects.get_or_create(**validated_data)
+        try:
+            return YoutubePosts.objects.get(slug=validated_data['slug'])
+        except YoutubePosts.DoesNotExist:
+            video = YoutubePosts.objects.create(**validated_data)
 
-        for video_format in formats:
-            video_obj, _ = YoutubeFormats.objects.get_or_create(**video_format)
-            video.formats.add(video_obj)
-        return video
+            for video_format in formats:
+                video_obj, _ = YoutubeFormats.objects.get_or_create(**video_format)
+                video.formats.add(video_obj)
+
+            return video
