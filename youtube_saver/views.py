@@ -22,19 +22,13 @@ class YoutubeApiView(YoutubeView):
         if not url:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        slug = url[url.rfind('='):]
         try:
-            video = YoutubePosts.objects.get(slug=slug)
-            serializer = self.get_serializer(video)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except YoutubePosts.DoesNotExist:
-            try:
-                with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
-                    result = ydl.extract_info(url, download=False)
-                    serializer = self.get_serializer(data=result)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_200_OK)
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            except:
-                return Response('Something went wrong while trying to get data', status=status.HTTP_400_BAD_REQUEST)
+            with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
+                result = ydl.extract_info(url, download=False)
+                serializer = self.get_serializer(data=result)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response('Something went wrong while trying to get data', status=status.HTTP_400_BAD_REQUEST)
