@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from api.models import CurrentVersion
+from home.models import MyApp
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,7 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
                    'is_superuser', 'last_login')
 
 
-class CurrentVersionSerializer(serializers.ModelSerializer):
+class MyAppSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
     class Meta:
-        model = CurrentVersion
-        exclude = ('created_at', 'id')
+        model = MyApp
+        fields = ('title', 'details', 'version', 'url')
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()

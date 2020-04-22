@@ -22,3 +22,5 @@ class AmountModelViewSet(viewsets.ModelViewSet):
             'amount': queryset.count(),
             'result': serializer.data
         })
+
+

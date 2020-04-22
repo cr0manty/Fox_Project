@@ -8,7 +8,7 @@ DATABASES = {
     'default': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vk_music',
+        'NAME': 'fox_project',
         'USER': '',
         'PASSWORD': '',
         'HOST': 'localhost',
