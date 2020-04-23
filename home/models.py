@@ -14,7 +14,7 @@ class MyApp(models.Model):
     icon = FilerImageField(related_name='app_icon', on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     version = models.CharField(max_length=10, help_text='0.0.1')
-    details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
+    update_details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now_add=True)
 
@@ -24,7 +24,7 @@ class MyApp(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
     def get_absolute_url(self):
-        return reverse('', kwargs={'slug': self.slug})
+        return reverse('app_view', kwargs={'slug': self.slug})
 
     def __str__(self):
         return '{} - {}'.format(self.title, self.version)

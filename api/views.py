@@ -14,9 +14,9 @@ User = get_user_model()
 
 
 class AppVersion(APIView):
-    def get(self, *args, **kwargs):
-        app = get_object_or_404(MyApp, slug=kwargs.get('slug'))
-        serializer = MyAppSerializer(app)
+    def get(self, request, slug):
+        app = get_object_or_404(MyApp, slug=slug)
+        serializer = MyAppSerializer(app, context={"request": request})
         return Response(serializer.data, status=200)
 
 

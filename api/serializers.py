@@ -20,4 +20,5 @@ class MyAppSerializer(serializers.ModelSerializer):
         fields = ('title', 'details', 'version', 'url')
 
     def get_url(self, obj):
-        return obj.get_absolute_url()
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.get_absolute_url())

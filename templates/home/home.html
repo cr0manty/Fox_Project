@@ -1,1 +1,22 @@
 {% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="main-img-block">
+        <img src="{% static 'images/main-banner.png' %}" alt="" class="main-img">
+    </div>
+    <div class="col-lg-12">
+        <div class="row">
+            {% for app in apps %}
+                <div class="col-lg-{% if not even and forloop.counter == amount %}12{% else %}6{% endif %} app-block">
+                    <div class="image" onclick="window.location = '{% url 'app_view' slug=app.slug %}'">
+                        <img src="{{ app.icon.url }}" alt="" class="app-icon">
+                        <h3>{{ app.title }}</h3>
+                        <p>{{ app.version }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
