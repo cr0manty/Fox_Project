@@ -71,7 +71,7 @@ body {
     padding: 1.875rem 1.25rem 2.5625rem 1.5625rem;
     opacity: var(--image-opacity);
     z-index: 9999;
-    color: #c5c5c5;
+    color: #dfdfdf;
 }
 
 .image p {
@@ -83,7 +83,7 @@ body {
     padding: 1.875rem 1.25rem 1.5625rem 1.5625rem;
     opacity: var(--image-opacity);
     z-index: 9999;
-    color: #c5c5c5;
+    color: #dfdfdf;
 }
 
 
