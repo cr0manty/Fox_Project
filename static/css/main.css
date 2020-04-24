@@ -3,10 +3,6 @@ body {
     color: #c1272d;
 }
 
-.content {
-    /*min-height: calc(100vh - 80px);*/
-}
-
 *, *:before, *:after {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -24,10 +20,10 @@ body {
 }
 
 .image {
-    border-radius: 100px;
+    border-radius: 60px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 0 7px 2px rgba(70, 70, 70, 0.9);
+    box-shadow: 0 0 18px 3px rgba(241, 90, 36, 0.87);
     max-height: 25rem;
     max-width: 25rem;
     min-height: 25rem;
@@ -84,28 +80,6 @@ body {
     opacity: 1;
 }
 
-@media (max-width: 320px) {
-    .image {
-        max-height: 15rem;
-        max-width: 15rem;
-        min-height: 15rem;
-        min-width: 15rem;
-    }
-    .main-img-block {
-        height: 130px;
-    }
-}
-
-@media (max-width: 755px) {
-    footer a{
-        font-size: 25px;
-    }
-
-    .main-img-block {
-        height: 220px;
-    }
-}
-
 .app-block {
     justify-content: center;
     flex-direction: column !important;
@@ -122,21 +96,20 @@ body {
 
 .main-img-block {
     height: 320px;
-    margin: 20px 0 80px 0;
-    max-width: 100%;
+    width: auto;
 }
 
 footer {
     background-color: rgba(20, 20, 20, 0.9);
     bottom: 0;
-    position: fixed!important;
+    position: fixed !important;
     left: 0;
     right: 0;
 }
 
 footer a {
     margin-bottom: 1rem;
-    margin-top: 5px;
+    margin-top: 12px;
     color: grey;
 }
 
@@ -150,3 +123,89 @@ footer p {
     margin-top: 5px;
     color: grey;
 }
+
+.apps {
+    margin-bottom: 2rem;
+}
+
+
+@media (max-width: 1267px) {
+    .image {
+        max-height: 20rem;
+        max-width: 20rem;
+        min-height: 20rem;
+        min-width: 20rem;
+    }
+
+    .app-icon {
+        max-height: 20rem;
+        max-width: 20rem;
+        min-height: 20rem;
+        min-width: 20rem;
+    }
+
+    .main-img-block {
+        height: 250px;
+    }
+}
+
+@media (max-width: 900px) {
+    footer a {
+        font-size: 17px;
+    }
+
+    .image {
+        max-height: 18rem;
+        max-width: 18rem;
+        min-height: 18rem;
+        min-width: 18rem;
+    }
+
+    .app-icon {
+        max-height: 18rem;
+        max-width: 18rem;
+        min-height: 18rem;
+        min-width: 18rem;
+    }
+
+    .main-img-block {
+        height: 180px;
+    }
+}
+
+@media (max-width: 540px) {
+    .image {
+        max-height: 15rem;
+        max-width: 15rem;
+        min-height: 15rem;
+        min-width: 15rem;
+    }
+
+    .app-icon {
+        max-height: 15rem;
+        max-width: 15rem;
+        min-height: 15rem;
+        min-width: 15rem;
+    }
+
+    .main-img-block {
+        height: 100px;
+    }
+    .main-img {
+        padding: 1rem;
+    }
+
+}
+
+@media (max-width: 390px) {
+    .main-img-block {
+        margin: 2rem 0 0 0;
+    }
+    .main-img {
+        padding: 0;
+        height: 50px;
+    }
+
+
+}
+
