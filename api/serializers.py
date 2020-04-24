@@ -17,7 +17,7 @@ class MyAppSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyApp
-        fields = ('title', 'details', 'version', 'url')
+        fields = ('title', 'update_details', 'version', 'url')
 
     def get_url(self, obj):
         request = self.context.get('request')
