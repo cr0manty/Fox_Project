@@ -10,8 +10,8 @@
         <div class="row">
             {% for app in apps %}
                 <div class="col-lg-{% if not even and forloop.counter == amount %}12{% else %}6{% endif %} app-block">
-                    <div class="image" onclick="window.location = '{% url 'app_view' slug=app.slug %}'">
-                        <img src="{{ app.icon.url }}" alt="" class="app-icon">
+                    <div class="image">
+                        <a href="{% url 'app_view' slug=app.slug %}"><img src="{{ app.icon.url }}" alt="" class="app-icon"></a>
                         <h3>{{ app.title }}</h3>
                         <p>{{ app.version }}</p>
                     </div>
@@ -19,4 +19,17 @@
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        $('.image').click(function () {
+            window.location = $(this).children('a').attr('href');
+        });
+
+        if (window.orientation !== undefined) {
+            document.body.classList.add("mobile");
+        }
+
+
+
+    </script>
 {% endblock %}
