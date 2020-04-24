@@ -9,8 +9,8 @@ from filer.fields.image import FilerImageField
 class MyApp(models.Model):
     title = models.CharField('Title', max_length=255)
     slug = models.SlugField()
-    ios_app = FilerFileField(related_name='ios', on_delete=models.CASCADE, blank=True, null=True)
-    android_app = FilerFileField(related_name='android', on_delete=models.CASCADE, blank=True, null=True)
+    ios_app = models.URLField(blank=True, null=True)
+    android_app = models.URLField(blank=True, null=True)
     icon = FilerImageField(related_name='app_icon', on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     version = models.CharField(max_length=10, help_text='0.0.1')
