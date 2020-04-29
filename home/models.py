@@ -1,9 +1,8 @@
 from django.db import models
-from django.urls import reverse
 from django.utils import timezone
 
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
+from ckeditor.fields import RichTextField
 
 
 class MyApp(models.Model):
@@ -12,9 +11,7 @@ class MyApp(models.Model):
     ios_app = models.URLField(blank=True, null=True)
     android_app = models.URLField(blank=True, null=True)
     icon = FilerImageField(related_name='app_icon', on_delete=models.CASCADE)
-    description = models.TextField(blank=True, null=True)
-    version = models.CharField(max_length=10, help_text='0.0.1')
-    update_details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
+    description = RichTextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now_add=True)
 
@@ -23,8 +20,22 @@ class MyApp(models.Model):
         self.updated_at = timezone.now()
         super().save(force_insert, force_update, using, update_fields)
 
-    def get_absolute_url(self):
-        return reverse('app_view', kwargs={'slug': self.slug})
+    @property
+    def last_version(self):
+        try:
+            return self.versions.latest('id')
+        except AppVersions.DoesNotExist:
+            return
 
     def __str__(self):
-        return '{} - {}'.format(self.title, self.version)
+        return self.title
+
+
+class AppVersions(models.Model):
+    version = models.CharField(max_length=10, help_text='x.x.x')
+    details = RichTextField(default='Bug fixes')
+    update_details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
+    app = models.ForeignKey(MyApp, on_delete=models.CASCADE, related_name='versions')
+
+    def __str__(self):
+        return '{} - {}'.format(self.version, self.app.title)

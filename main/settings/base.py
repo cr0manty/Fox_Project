@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_rq',
     'authtools',
+    'ckeditor',
 
     'main',
     'users',
@@ -165,4 +166,31 @@ YOUTUBE_DOWNLOAD_PARAMS = {
         'preferredcodec': 'mp3',
         'preferredquality': '192',
     }],
+}
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'fillEmptyBlocks': False,
+        'extraPlugins': 'bidi',
+        'removePlugins': 'stylesheetparser',
+        'allowedContent': False,
+        'toolbar_Bidi': [
+            ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
+            ['Link', 'Unlink', 'Anchor'],
+            ['BidiLtr', 'BidiRtl'],
+            ['TextColor', 'BGColor'],
+            ['Smiley', 'SpecialChar'], ['Source'],
+        ],
+        'toolbar': 'Bidi',
+        'width': 865,
+        'enterMode': 2,
+        'forcePasteAsPlainText': True,
+        'disallowedContent': 'animate'
+    }
+}
+
+CKEDITOR_SETTINGS = {
+    'autoParagraph': False,
+    'allowedContent': False,
+    'disallowedContent': 'animate'
 }

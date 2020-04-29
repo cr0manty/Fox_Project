@@ -15,7 +15,13 @@
                             <img src="{{ app.icon.url }}" alt="" class="app-icon">
                         </a>
                         <h3>{{ app.title }}</h3>
-                        <p>{{ app.version }}</p>
+                        <p>
+                            {% if app.last_version %}
+                                {{ app.last_version.version }}
+                            {% else %}
+                                0.0.0
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             {% endfor %}
@@ -27,7 +33,7 @@
             window.location = $(this).children('a').attr('href');
         });
 
-            let newHeight = $(window).height() + "px";
-            $(".full_image").css("window", newHeight);
+        let newHeight = $(window).height() + "px";
+        $(".full_image").css("window", newHeight);
     </script>
 {% endblock %}

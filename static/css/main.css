@@ -34,11 +34,11 @@ body {
     --image-visibility: 0;
 }
 
-.image:not([class*="mobile"]):hover {
+body:not([class*="mobile"]) .image:hover {
     --image-visibility: 1;
 }
 
-.image:not([class*="mobile"]):hover:after {
+body:not([class*="mobile"])  .image:hover:after {
     content: "";
     position: absolute;
     width: 100%;
@@ -205,7 +205,13 @@ footer p {
         padding: 0;
         height: 50px;
     }
-
-
 }
 
+.mobile .image {
+    position: unset;
+}
+
+.mobile .image h3 {
+    bottom: auto;
+    opacity: 1;
+}

@@ -1,6 +1,7 @@
 .idea/
 venv/
 media/
+staticfiles/
 
 !media/user-default.jpg
 
