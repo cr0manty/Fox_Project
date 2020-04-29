@@ -8,4 +8,6 @@ class MyAppAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
-admin.site.register(AppVersions)
+@admin.register(AppVersions)
+class AppVersionsAdmin(admin.ModelAdmin):
+    readonly_fields = ('create_date', )
