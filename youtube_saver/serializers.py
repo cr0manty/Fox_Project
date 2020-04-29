@@ -1,13 +1,19 @@
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from youtube_saver.models import YoutubeFormats, YoutubePosts
+from youtube_saver.models import YoutubePosts
 
 
-class YoutubeFormatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = YoutubeFormats
-        exclude = ('id',)
+class YoutubeFormatsSerializer(serializers.Serializer):
+    FILE_TYPES = (
+        ('song', 'Song'),
+        ('video', 'Video'),
+        ('video_song', 'Video with Audio')
+    )
+    url = serializers.CharField()
+    size = serializers.IntegerField(default=0)
+    file_type = serializers.CharField(max_length=10, default='song')
+    format = serializers.CharField(max_length=128)
 
     def run_validation(self, data=empty):
         (is_empty_value, data) = self.validate_empty_values(data)
@@ -27,8 +33,6 @@ class YoutubeFormatsSerializer(serializers.ModelSerializer):
 
 
 class YoutubePostsSerializer(serializers.ModelSerializer):
-    formats = YoutubeFormatsSerializer(many=True)
-
     class Meta:
         model = YoutubePosts
         exclude = ('id',)
@@ -41,14 +45,8 @@ class YoutubePostsSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        formats = validated_data.pop('formats')
         try:
             return YoutubePosts.objects.get(slug=validated_data['slug'])
         except YoutubePosts.DoesNotExist:
             video = YoutubePosts.objects.create(**validated_data)
-
-            for video_format in formats:
-                video_obj, _ = YoutubeFormats.objects.get_or_create(**video_format)
-                video.formats.add(video_obj)
-
             return video

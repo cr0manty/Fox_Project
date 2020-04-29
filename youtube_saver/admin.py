@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from youtube_saver.models import YoutubePosts, YoutubeFormats
+from youtube_saver.models import YoutubePosts
 
 
 @admin.register(YoutubePosts)
@@ -9,7 +9,3 @@ class YoutubePostsAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(YoutubeFormats)
-class YoutubeFormatsAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request):
-        return False

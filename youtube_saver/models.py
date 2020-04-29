@@ -1,22 +1,6 @@
 from django.db import models
 
 
-class YoutubeFormats(models.Model):
-    FILE_TYPES = (
-        ('song', 'Song'),
-        ('video', 'Video'),
-        ('video_song', 'Video with Audio')
-    )
-    url = models.TextField(blank=True, null=True)
-    size = models.PositiveIntegerField(default=0)
-    file_type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True, default='song')
-    format = models.CharField(max_length=128, blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'YoutubeFormat'
-        verbose_name_plural = 'YoutubeFormats'
-
-
 class YoutubePosts(models.Model):
     slug = models.SlugField(blank=True, null=True)
     uploader = models.CharField(max_length=255, blank=True, null=True)
@@ -28,7 +12,6 @@ class YoutubePosts(models.Model):
     like_count = models.PositiveIntegerField(default=0)
     dislike_count = models.PositiveIntegerField(default=0)
     image = models.TextField(blank=True, null=True)
-    formats = models.ManyToManyField(YoutubeFormats, blank=True)
     artist = models.CharField(max_length=511, blank=True, null=True)
     track = models.CharField(max_length=511, blank=True, null=True)
     album = models.CharField(max_length=511, blank=True, null=True)
