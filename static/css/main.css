@@ -100,7 +100,7 @@ body:not([class*="mobile"])  .image:hover:after {
 }
 
 footer {
-    background-color: rgba(20, 20, 20, 0.9);
+    background-color: rgba(20, 20, 20, 0.5);
     bottom: 0;
     position: fixed !important;
     left: 0;
