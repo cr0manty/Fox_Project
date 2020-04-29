@@ -215,3 +215,7 @@ footer p {
     bottom: auto;
     opacity: 1;
 }
+
+.app-block {
+    margin-bottom: 100px;
+}
