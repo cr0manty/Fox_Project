@@ -8,8 +8,7 @@ from ckeditor.fields import RichTextField
 class MyApp(models.Model):
     title = models.CharField('Title', max_length=255)
     slug = models.SlugField()
-    ios_app = models.URLField(blank=True, null=True)
-    android_app = models.URLField(blank=True, null=True)
+
     icon = FilerImageField(related_name='app_icon', on_delete=models.CASCADE)
     description = RichTextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -37,6 +36,8 @@ class AppVersions(models.Model):
     update_details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
     app = models.ForeignKey(MyApp, on_delete=models.CASCADE, related_name='versions')
     create_date = models.DateTimeField(auto_now_add=True)
+    ios_app = models.URLField(blank=True, null=True)
+    android_app = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.version, self.app.title)

@@ -10,18 +10,47 @@
         <div class="row">
             {% for app in apps %}
                 <div class="col-lg-{% if not even and forloop.counter == amount %}12{% else %}6{% endif %} app-block">
-                    <div class="image">
-                        <a href="{% url 'app_view' slug=app.slug %}">
+                    <div class="image image-btn">
+                        <ul class="desc">
+                            <li>
+                                <h4>{{ app.title }}</h4>
+                            </li>
+                            <li>
+                                Version:
+                                <span>
+                                {% if app.last_version %}
+                                    {{ app.last_version.version }}
+                                {% else %}
+                                    Not released
+                                {% endif %}
+                            </span>
+                            </li>
+                            {% if app.description %}
+                                <li class="app-description">
+                                    Description:
+                                    <span>{{ app.description|truncatechars:60 }}</span>
+                                </li>
+                            {% endif %}
+                            {% if app.last_version %}
+                                <li class="download-links">
+                                    <div class="downloads">
+                                        {% if not app.last_version.ios_app %}
+                                            <a href="{{ app.last_version.ios_app }}" target="_blank">
+                                                <img src="{% static "images/ios-download.png" %}" alt="ios">
+                                            </a>
+                                        {% endif %}
+                                        {% if not app.last_version.android_app %}
+                                            <a href="{{ app.last_version.android_app }}" target="_blank">
+                                                <img src="{% static "images/android-download.png" %}" alt="android">
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <a class="image-btn" tabindex="-1">
                             <img src="{{ app.icon.url }}" alt="" class="app-icon">
                         </a>
-                        <h3>{{ app.title }}</h3>
-                        <p>
-                            {% if app.last_version %}
-                                {{ app.last_version.version }}
-                            {% else %}
-                                0.0.0
-                            {% endif %}
-                        </p>
                     </div>
                 </div>
             {% endfor %}
@@ -29,10 +58,6 @@
     </div>
 
     <script>
-        $('.image').click(function () {
-            window.location = $(this).children('a').attr('href');
-        });
-
         let newHeight = $(window).height() + "px";
         $(".full_image").css("window", newHeight);
     </script>
