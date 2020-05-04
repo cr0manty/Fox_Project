@@ -23,7 +23,7 @@ body {
 }
 
 .image {
-    border-radius: 60px;
+    border-radius: 50px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 0 18px 3px rgba(241, 90, 36, 0.87);
@@ -45,8 +45,10 @@ body {
     display: var(--desc-display);
     list-style-type: none;
     padding: 2rem 3rem 2rem 3rem;
-    background: rgba(0, 0, 0, 0.85);
-    color: #bbbbbb
+    background: rgba(34, 34, 34, 0.85);
+    color: #bbbbbb;
+    border-radius: 50px;
+    box-shadow: 0 0 18px 3px rgba(241, 90, 36, 0.87);
 }
 
 .description-show {

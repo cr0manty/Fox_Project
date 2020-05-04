@@ -34,12 +34,12 @@
                             {% if app.last_version %}
                                 <li class="download-links">
                                     <div class="downloads">
-                                        {% if not app.last_version.ios_app %}
+                                        {% if app.last_version.ios_app %}
                                             <a href="{{ app.last_version.ios_app }}" target="_blank">
                                                 <img src="{% static "images/ios-download.png" %}" alt="ios">
                                             </a>
                                         {% endif %}
-                                        {% if not app.last_version.android_app %}
+                                        {% if app.last_version.android_app %}
                                             <a href="{{ app.last_version.android_app }}" target="_blank">
                                                 <img src="{% static "images/android-download.png" %}" alt="android">
                                             </a>
