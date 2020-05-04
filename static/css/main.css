@@ -83,7 +83,7 @@ body:not([class*="mobile"])  .image:hover:after {
 .app-block {
     justify-content: center;
     flex-direction: column !important;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
 .main-img {
@@ -95,8 +95,9 @@ body:not([class*="mobile"])  .image:hover:after {
 }
 
 .main-img-block {
-    height: 320px;
+    height: 300px;
     width: auto;
+    margin-top: 3rem;
 }
 
 footer {
@@ -126,6 +127,7 @@ footer p {
 
 .apps {
     margin-bottom: 2rem;
+    margin-top: 3rem;
 }
 
 
@@ -214,8 +216,4 @@ footer p {
 .mobile .image h3 {
     bottom: auto;
     opacity: 1;
-}
-
-.app-block {
-    margin-bottom: 100px;
 }
