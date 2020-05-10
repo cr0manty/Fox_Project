@@ -5,6 +5,7 @@ body {
     --icon-size: 25rem;
     --desc-display: none;
     --download-height: 3rem;
+    --download-width: 6rem;
 }
 
 *, *:before, *:after {
@@ -65,8 +66,8 @@ body {
 .downloads img {
     max-height: var(--download-height);
     min-height: var(--download-height);
-    max-width: 6rem;
-    min-width: 6rem;
+    max-width: var(--download-width);
+    min-width: var(--download-width);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -211,6 +212,11 @@ footer p {
     .app-description {
         display: none;
     }
+
+    .downloads img {
+        --download-height: 1.8rem;
+        --download-width: 4.5rem;
+    }
 }
 
 @media (max-width: 512px) {
@@ -224,7 +230,8 @@ footer p {
     }
 
     .downloads img {
-        --download-height: 1.8rem;
+        --download-height: 1.5rem;
+        --download-width: 3rem;
     }
 
 }
