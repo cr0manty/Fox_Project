@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -22,13 +23,12 @@ class MyAppSerializer(serializers.ModelSerializer):
         fields = ('title', 'update_details', 'version', 'url')
 
     def get_url(self, obj):
-        request = self.context.get('request')
-        return request.build_absolute_uri('home')
+        return reverse('home')
 
     def get_version(self, obj):
         last = obj.last_version
         return last.version if last else '0.0.0'
 
     def get_update_details(self, obj):
-        last = obj.last_version
+        last = obj.description
         return last.version if last else 'Your version is out of date, please upgrade to a new version'

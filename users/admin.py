@@ -9,6 +9,7 @@ fieldsets = UserAdmin.fieldsets
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    list_display = ('is_active', 'username', 'is_staff', 'is_superuser', 'can_use_vk', 'date_joined')
     fieldsets += (
         ('User data', {'fields': (
             'first_name', 'last_name'
