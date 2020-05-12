@@ -16,7 +16,7 @@ class User(AbstractUser):
     vk_login = models.CharField(max_length=255, null=True, blank=True)
     vk_password = models.CharField(max_length=255, null=True, blank=True)
     can_use_vk = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='user_image', default='user-default.jpg')
+    image = models.ImageField(upload_to='user_image', default='user-default.png')
 
     def save(self, *args, **kwargs):
         if self.image.name.startswith('http'):

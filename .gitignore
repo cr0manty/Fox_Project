@@ -4,6 +4,7 @@ media/
 staticfiles/
 
 !media/user-default.jpg
+!media/player-default.jpg
 
 local.py
 config.json
