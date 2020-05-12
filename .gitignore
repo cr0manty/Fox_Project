@@ -2,9 +2,12 @@
 venv/
 media/
 staticfiles/
+__pycache__/
 
 !media/user-default.png
 !media/player-default.jpg
 
 local.py
 config.json
+
+*.pyc
