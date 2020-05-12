@@ -75,7 +75,7 @@ body {
 .download-links {
     position: absolute;
     bottom: 1.5rem;
-    width: calc(var(--icon-size) - 5.5rem);
+    width: calc(var(--icon-size) - 5.6rem);
 }
 
 body:not([class*="mobile"]) .image:hover {
