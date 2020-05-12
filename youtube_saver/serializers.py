@@ -20,14 +20,25 @@ class YoutubeFormatsSerializer(serializers.Serializer):
         if is_empty_value:
             return data
 
-        value = {
-            'url': data['url'],
-            'size': data['filesize'],
-            'file_type': 'song' if data['fps'] is None else 'video',
-            'format': data['format_note'],
-        }
-        value['file_type'] = 'video_song' if value['format'].endswith('p') and value['file_type'] == 'song' else value[
-            'file_type']
+        if data.get('fragment_base_url'):
+            video = data['format'].find('audio') == -1
+            format_index = data['format'].find(' - ')
+            value = {
+                'url': data['fragment_base_url'],
+                'file_type': 'video' if video else 'song',
+                'format': data['format'][format_index + 3:data['format'].find(' (')] if video else data['format'][
+                                                                                                   :format_index],
+            }
+        else:
+            value = {
+                'url': data['url'],
+                'size': data['filesize'],
+                'file_type': 'song' if data['fps'] is None else 'video',
+                'format': data['format_note'],
+            }
+            value['file_type'] = 'video_song' if value['format'].endswith('p') and value['file_type'] == 'song' else \
+            value[
+                'file_type']
 
         return value
 
