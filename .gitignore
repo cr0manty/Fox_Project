@@ -3,7 +3,7 @@ venv/
 media/
 staticfiles/
 
-!media/user-default.jpg
+!media/user-default.png
 !media/player-default.jpg
 
 local.py
