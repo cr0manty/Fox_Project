@@ -25,6 +25,7 @@ class YoutubeFormatsSerializer(serializers.Serializer):
             format_index = data['format'].find(' - ')
             value = {
                 'url': data['fragment_base_url'],
+                'size': data['filesize'],
                 'file_type': 'video' if video else 'song',
                 'format': data['format'][format_index + 3:data['format'].find(' (')] if video else data['format'][
                                                                                                    :format_index],
