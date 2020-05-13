@@ -168,6 +168,8 @@ YOUTUBE_DOWNLOAD_PARAMS = {
     }],
 }
 
+TELEGRAM_URL = "https://api.telegram.org/bot"
+
 CKEDITOR_CONFIGS = {
     'default': {
         'fillEmptyBlocks': False,

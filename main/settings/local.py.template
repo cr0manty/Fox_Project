@@ -4,11 +4,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TELEGRAM_BOT_YOUTUBE_TOKEN = ''
+
 DATABASES = {
     'default': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fox_project',
+        'NAME': '',
         'USER': '',
         'PASSWORD': '',
         'HOST': 'localhost',

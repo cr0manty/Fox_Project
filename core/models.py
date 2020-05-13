@@ -13,3 +13,21 @@ class RQLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_exception = models.BooleanField(default=False)
     exception_text = models.TextField(null=True, blank=True)
+
+
+class TelegramBotLogs(models.Model):
+    LOG_TYPE = (
+        (0, 'Error'),
+        (1, 'Not Sended'),
+        (2, 'Not Found')
+    )
+
+    chat_id = models.IntegerField(blank=True)
+    group = models.BooleanField(default=False)
+    log_type = models.IntegerField(choices=LOG_TYPE, default=0)
+    content = models.TextField(blank=True, null=True)
+    user_id = models.IntegerField(blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+    language = models.CharField(max_length=64, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
