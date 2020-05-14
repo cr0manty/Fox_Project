@@ -7,5 +7,5 @@ youtube_find = YoutubeApiView.as_view({'get': 'retrieve'})
 
 urlpatterns = [
     path('', youtube_find),
-    path('webhook/', csrf_exempt(TelegramBotView.as_view())),
+    path('webhook/<token>', csrf_exempt(TelegramBotView.as_view()), name='telegram_webhook'),
 ]

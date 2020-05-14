@@ -26,8 +26,21 @@ class TelegramBotLogs(models.Model):
     group = models.BooleanField(default=False)
     log_type = models.IntegerField(choices=LOG_TYPE, default=0)
     content = models.TextField(blank=True, null=True)
+    exception = models.TextField(blank=True, null=True)
     user_id = models.IntegerField(blank=True, null=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     language = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @staticmethod
+    def get_kwargs(message, e='', log_type=0):
+        return {
+            'chat_id': message.chat.id,
+            'group': message.chat.type == 'group',
+            'log_type': log_type,
+            'content': message.chat.text,
+            'exception': e,
+            'user_id': message.from_user.id,
+            'username': message.from_user.username,
+            'language': message.json['from'].get('language_code')
+        }

@@ -6,6 +6,10 @@ ALLOWED_HOSTS = []
 
 TELEGRAM_BOT_YOUTUBE_TOKEN = ''
 
+PROTOCOL = ''
+DOMAIN = ''
+
+
 DATABASES = {
     'default': {
         'CONN_MAX_AGE': 0,

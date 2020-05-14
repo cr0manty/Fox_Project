@@ -1,18 +1,21 @@
-import json
-
+import re
 import requests
 import youtube_dl
 
 from django.conf import settings
-from django.http import JsonResponse
-from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
+from telebot import TeleBot, types
+
+from core.models import TelegramBotLogs
 from youtube_saver.models import YoutubePosts
 from youtube_saver.serializers import YoutubePostsSerializer, YoutubeFormatsSerializer
+
+bot = TeleBot(settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
 
 
 class YoutubeApiView(ModelViewSet):
@@ -44,58 +47,44 @@ class YoutubeApiView(ModelViewSet):
             return Response('Something went wrong while trying to get data', status=status.HTTP_400_BAD_REQUEST)
 
 
-class TelegramBotView(View):
+class TelegramBotView(APIView):
     def post(self, request, *args, **kwargs):
-        t_data = json.loads(request.body)
+        json_str = request.body.decode('UTF-8')
+        update = types.Update.de_json(json_str)
+        bot.process_new_updates([update])
 
-        t_message = t_data["message"]
-        t_chat = t_message["chat"]
+        return Response({'code': 200})
 
-        return JsonResponse({"ok": "POST request processed"})
 
-    # def parse_message(message):
-    #     try:
-    #         urls = re.findall(r'(?P<url>https?://[^\s]+)', message.text)
-    #         if urls:
-    #             with youtube_dl.YoutubeDL({
-    #                 'format': 'bestaudio/best',
-    #                 'postprocessors': [{
-    #                     'key': 'FFmpegExtractAudio',
-    #                     'preferredcodec': 'mp3',
-    #                     'preferredquality': '320',
-    #                 }],
-    #             }) as ydl:
-    #                 url_param = urls[0].find('&')
-    #                 result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
-    #                 bot.send_chat_action(message.chat.id, action='sending')
-    #                 true_song = []
-    #
-    #                 for result_format in result['formats']:
-    #                     if result_format['format_note'] == 'tiny':
-    #                         true_song.append(result_format)
-    #                     else:
-    #                         break
-    #                 if true_song:
-    #                     body = requests.get(sorted(true_song, key=lambda item: item['format_id'])[-1]['url'])
-    #                     bot.send_audio(message.chat.id, audio=body.content, title=result['title'])
-    #     except Exception as e:
-    #         print(e)
+@bot.message_handler()
+def parse_message(message):
+    try:
+        urls = re.findall(
+            r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?',
+            message.text)
+        if urls:
+            with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
+                url_param = urls[0].find('&')
+                result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
+                true_song = []
 
-    @staticmethod
-    def data(chat_id, parse_mode, additional=None):
-        data = {"chat_id": chat_id}
-        if parse_mode:
-            data['parse_mode'] = parse_mode
+                for result_format in result['formats']:
+                    if result_format['format_note'] == 'tiny' or result_format['format_note'].startswith('DASH'):
+                        true_song.append(result_format)
 
-        if additional:
-            data.update(additional)
+                if true_song:
+                    try:
+                        bot.send_chat_action(message.chat.id, action='upload_audio')
+                        body = requests.get(sorted(true_song, key=lambda item: item['format_id'])[-1]['url'])
+                        bot.send_audio(message.chat.id, audio=body.content, title=result['title'])
+                    except Exception as e:
+                        TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
+                else:
+                    TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
+    except Exception as e:
+        TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e))
 
-        return data
 
-    @staticmethod
-    def send(action, data=None):
-        if data is not dict:
-            data = {}
-        requests.post(
-            f"{settings.TELEGRAM_URL}{settings.TELEGRAM_BOT_YOUTUBE_TOKEN}/{action}", data=data
-        )
+webhook_url = '{}://{}/{}/{}'.format(settings.PROTOCOL, settings.DOMAIN, 'api/youtube/webhook',
+                                     settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
+bot.set_webhook(url=webhook_url)
