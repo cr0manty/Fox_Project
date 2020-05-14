@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Log, RQLog
+from .models import Log, RQLog, TelegramBotLogs
 
 
 class ReadOnlyAdminMixin(object):
@@ -21,5 +21,6 @@ class RQLogAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     pass
 
 
+@admin.register(TelegramBotLogs)
 class TelegramBotLogsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     pass
