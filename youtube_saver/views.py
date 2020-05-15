@@ -1,5 +1,4 @@
 import re
-import requests
 import youtube_dl
 
 from django.conf import settings
@@ -14,6 +13,8 @@ from telebot import TeleBot, types
 from core.models import TelegramBotLogs
 from youtube_saver.models import YoutubePosts
 from youtube_saver.serializers import YoutubePostsSerializer, YoutubeFormatsSerializer
+
+from .tasks import send_telegram_audio
 
 bot = TeleBot(settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
 
@@ -63,7 +64,19 @@ def parse_message(message):
             r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?',
             message.text)
         if urls:
-            with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
+            with youtube_dl.YoutubeDL({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'wav',
+                    'preferredquality': '192'
+                }],
+                'postprocessor_args': [
+                    '-ar', '16000'
+                ],
+                'prefer_ffmpeg': True,
+                'keepvideo': True
+            }) as ydl:
                 url_param = urls[0].find('&')
                 result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
                 true_song = []
@@ -74,10 +87,8 @@ def parse_message(message):
 
                 if true_song:
                     try:
-                        bot.send_chat_action(message.chat.id, action='upload_document')
-                        body = requests.get(sorted(true_song, key=lambda item: item['format_id'])[-1]['url'])
-                        bot.send_audio(message.chat.id, audio=body.content, title=result['title'],
-                                       duration=result['duration'])
+                        best_audio = sorted(true_song, key=lambda item: item['format_id'])[-1]['url']
+                        send_telegram_audio.delay(bot, message, best_audio, result['title'], result['duration'])
                     except Exception as e:
                         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
                 else:
