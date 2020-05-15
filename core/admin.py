@@ -4,6 +4,8 @@ from .models import Log, RQLog, TelegramBotLogs
 
 
 class ReadOnlyAdminMixin(object):
+    list_display = ('from_user', 'created_at')
+
     def has_add_permission(self, request):
         return False
 
@@ -23,4 +25,4 @@ class RQLogAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 
 @admin.register(TelegramBotLogs)
 class TelegramBotLogsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
-    pass
+    list_display = ('username', 'created_at')
