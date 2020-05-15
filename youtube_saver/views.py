@@ -64,19 +64,7 @@ def parse_message(message):
             r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?',
             message.text)
         if urls:
-            with youtube_dl.YoutubeDL({
-                'format': 'bestaudio/best',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'wav',
-                    'preferredquality': '192'
-                }],
-                'postprocessor_args': [
-                    '-ar', '16000'
-                ],
-                'prefer_ffmpeg': True,
-                'keepvideo': True
-            }) as ydl:
+            with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
                 url_param = urls[0].find('&')
                 result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
                 true_song = []
@@ -90,10 +78,12 @@ def parse_message(message):
                         best_audio = sorted(true_song, key=lambda item: item['format_id'])[-1]['url']
                         send_telegram_audio.delay(bot, message, best_audio, result['title'], result['duration'])
                     except Exception as e:
+                        print(e)
                         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
                 else:
                     TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
     except Exception as e:
+        print(e)
         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e))
 
 
