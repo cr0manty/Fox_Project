@@ -55,4 +55,6 @@ class TelegramBotLogs(models.Model):
         return '{} ({})'.format(self.username or '', self.created_at)
 
     class Meta:
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
+        verbose_name = 'Telegram Bot Log'
+        verbose_name_plural = 'Telegram Bot Logs'
