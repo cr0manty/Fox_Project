@@ -69,14 +69,15 @@ def parse_message(message):
                 true_song = []
 
                 for result_format in result['formats']:
-                    if result_format['format_note'] == 'tiny' or result_format['format_note'].startswith('DASH'):
+                    if result_format['format_note'] == 'tiny':
                         true_song.append(result_format)
 
                 if true_song:
                     try:
-                        bot.send_chat_action(message.chat.id, action='upload_audio')
+                        bot.send_chat_action(message.chat.id, action='upload_document')
                         body = requests.get(sorted(true_song, key=lambda item: item['format_id'])[-1]['url'])
-                        bot.send_audio(message.chat.id, audio=body.content, title=result['title'])
+                        bot.send_audio(message.chat.id, audio=body.content, title=result['title'],
+                                       duration=result['duration'])
                     except Exception as e:
                         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
                 else:
