@@ -13,8 +13,7 @@ from telebot import TeleBot, types
 from core.models import TelegramBotLogs
 from youtube_saver.models import YoutubePosts
 from youtube_saver.serializers import YoutubePostsSerializer, YoutubeFormatsSerializer
-
-from .tasks import send_telegram_audio
+from youtube_saver.utils import send_telegram_audio
 
 bot = TeleBot(settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
 
@@ -76,7 +75,7 @@ def parse_message(message):
                 if true_song:
                     try:
                         best_audio = sorted(true_song, key=lambda item: item['format_id'])[-1]['url']
-                        send_telegram_audio.delay(bot, message, best_audio, result['title'], result['duration'])
+                        send_telegram_audio(bot, message, best_audio, result['title'], result['duration'])
                     except Exception as e:
                         print(e)
                         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
@@ -87,6 +86,13 @@ def parse_message(message):
         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e))
 
 
-webhook_url = '{}://{}/{}/{}'.format(settings.PROTOCOL, settings.DOMAIN, 'api/youtube/webhook',
-                                     settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
-bot.set_webhook(url=webhook_url)
+def set_webhook(request=None):
+    webhook_url = '{}://{}/{}/{}'.format(settings.PROTOCOL, settings.DOMAIN, 'api/youtube/webhook',
+                                         settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
+    bot.remove_webhook()
+    bot.set_webhook(url=webhook_url)
+    if request:
+        return Response(status=status.HTTP_200_OK)
+
+
+set_webhook()

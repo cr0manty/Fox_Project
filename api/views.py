@@ -1,13 +1,18 @@
+from datetime import datetime
+
+import django_rq
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from home.models import MyApp
+from users.tasks import update_users_song_list
 from .serializers import UserSerializer, MyAppSerializer
 
 User = get_user_model()
@@ -45,3 +50,14 @@ class UserRegistration(APIView):
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SignInView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        scheduler = django_rq.get_scheduler('default')
+        scheduler.schedule(
+            scheduled_time=datetime.utcnow(),
+            func=update_users_song_list,
+            repeat=None
+        )
+        return super().post(request, *args, **kwargs)
