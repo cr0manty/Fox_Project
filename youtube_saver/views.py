@@ -70,16 +70,26 @@ def parse_message(message):
 
                 for result_format in result['formats']:
                     if result_format['format_note'] == 'tiny':
-                        true_song.append(result_format)
+                        true_song.append({
+                            'format': result_format['format_id'],
+                            'url': result_format['url']
+                        })
+                    if result_format['format_note'].startswith('DASH') and result_format['format_note'].find(
+                            'audio') != -1:
+                        true_song.append({
+                            'format': result_format['format_id'],
+                            'url': result_format['fragment_base_url']
+                        })
 
                 if true_song:
                     try:
-                        best_audio = sorted(true_song, key=lambda item: item['format_id'])[-1]['url']
+                        best_audio = sorted(true_song, key=lambda item: item['format'])[-1]['url']
                         send_telegram_audio(bot, message, best_audio, result['title'], result['duration'])
                     except Exception as e:
                         print(e)
                         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e, log_type=1))
                 else:
+                    print('Not Found')
                     TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
     except Exception as e:
         print(e)
