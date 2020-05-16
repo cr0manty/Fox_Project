@@ -82,7 +82,6 @@ def parse_message(message):
                         })
 
                 if true_song:
-                    bot.send_message()
                     best_audio = sorted(true_song, key=lambda item: item['format'])[-1]['url']
                     send_telegram_audio(bot, message, best_audio, result['title'], result['duration'])
                 else:
