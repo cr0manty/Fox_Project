@@ -30,7 +30,7 @@ def send_telegram_audio(bot, message, url, title, duration):
             delete_file.delay(filename)
         else:
             print('Not Found')
-            TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
+            TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=body.content,  log_type=2))
 
     except Exception as e:
         print(e)
