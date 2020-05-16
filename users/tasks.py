@@ -9,6 +9,7 @@ from core.models import RQLog
 from songs.models import Song
 
 
+@django_rq.job
 def update_users_song_list():
     RQLog.objects.create(from_user='test')
     for user in User.objects.filter(can_use_vk=True):

@@ -54,10 +54,5 @@ class UserRegistration(APIView):
 
 class SignInView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        scheduler = django_rq.get_scheduler('default')
-        scheduler.schedule(
-            scheduled_time=datetime.utcnow(),
-            func=update_users_song_list,
-            repeat=None
-        )
+        update_users_song_list.delay()
         return super().post(request, *args, **kwargs)
