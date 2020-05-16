@@ -21,12 +21,15 @@ def send_telegram_audio(bot, message, url, title, duration):
         body = requests.get(url)
         if body.status_code == 200:
             print('Saving File')
+            bot.send_message(message.chat.id, 'Saving File')
             audio = AudioSegment.from_file(io.BytesIO(body.content))
 
             print('Converting File')
+            bot.send_message(message.chat.id, 'Converting File')
             audio = audio.export(filename, format='mp3', codec='mp3')
 
             print('Sending File')
+            bot.send_message(message.chat.id, 'Sending File')
             bot.send_chat_action(message.chat.id, action='upload_document')
             bot.send_audio(message.chat.id, audio=audio, title=title, duration=duration)
             start_delete(filename)
