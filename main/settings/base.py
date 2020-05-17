@@ -196,3 +196,5 @@ CKEDITOR_SETTINGS = {
     'allowedContent': False,
     'disallowedContent': 'animate'
 }
+
+YOUTUBE_REGEX = r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?'

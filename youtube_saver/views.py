@@ -25,7 +25,7 @@ class YoutubeApiView(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         url = self.request.GET.get('url')
-        if not url:
+        if not url or not re.findall(settings.YOUTUBE_REGEX, url)[-1]:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -59,9 +59,7 @@ class TelegramBotView(APIView):
 @bot.message_handler()
 def parse_message(message):
     try:
-        urls = re.findall(
-            r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?',
-            message.text)
+        urls = re.findall(settings.YOUTUBE_REGEX, message.text)
         if urls:
             with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
                 url_param = urls[0].find('&')
@@ -97,7 +95,11 @@ def set_webhook(request=None):
                                          settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
     bot.remove_webhook()
     bot.set_webhook(url=webhook_url)
+
     if request:
+        if request.GET.get('remove'):
+            bot.remove_webhook()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_200_OK)
 
 

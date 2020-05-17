@@ -38,8 +38,7 @@ class YoutubeFormatsSerializer(serializers.Serializer):
                 'format': data['format_note'],
             }
             value['file_type'] = 'video_song' if value['format'].endswith('p') and value['file_type'] == 'song' else \
-            value[
-                'file_type']
+                value['file_type']
 
         return value
 
