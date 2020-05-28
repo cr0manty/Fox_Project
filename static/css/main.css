@@ -97,9 +97,9 @@ body:not([class*="mobile"]) .image:hover {
 }
 
 .main-img-block {
-    height: 300px;
+    height: 250px;
     width: auto;
-    margin-top: 3rem;
+    margin: 2rem 3rem 2rem 3rem;
 }
 
 footer {
@@ -157,7 +157,7 @@ footer p {
     }
 }
 
-@media (max-height: 800px) {
+@media (max-height: 925px) {
     .image {
         --icon-block-size: 19rem;
         --icon-size: 19rem;
@@ -172,10 +172,6 @@ footer p {
         --icon-size: 19rem;
     }
 
-    .main-img-block {
-        height: 200px;
-        margin: 2rem 3rem 2rem 3rem;
-    }
 
     .downloads img {
         --download-height: 2.5rem;
