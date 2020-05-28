@@ -132,6 +132,22 @@ footer p {
     margin-top: 3rem;
 }
 
+@media (max-height: 800px) {
+    .image {
+        --icon-block-size: 19rem;
+        --icon-size: 19rem;
+    }
+
+    .download-links {
+        --icon-size: 19rem;
+    }
+
+    .app-icon {
+        --icon-block-size: 19rem;
+        --icon-size: 19rem;
+    }
+}
+
 
 @media (max-width: 1500px) {
     .image {
