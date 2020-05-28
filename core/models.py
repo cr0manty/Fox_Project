@@ -1,4 +1,5 @@
 from django.db import models
+from vk_api import VkApi
 
 
 class Log(models.Model):
@@ -58,3 +59,26 @@ class TelegramBotLogs(models.Model):
         ordering = ('-created_at',)
         verbose_name = 'Telegram Bot Log'
         verbose_name_plural = 'Telegram Bot Logs'
+
+
+class VKAuthMixin(object):
+    captcha_key = None
+    captcha_url = None
+    captcha_sid = None
+
+    def captcha_handler(self, captcha):
+        if self.captcha_key and self.captcha_sid:
+            captcha.sid = self.captcha_sid
+            return captcha.try_again(self.captcha_key)
+        else:
+            self.captcha_url = captcha.get_url()
+            self.captcha_sid = captcha.sid
+
+    def try_auth(self, post, username, password):
+        self.captcha_key = post.get('captcha')
+        self.captcha_sid = post.get('sid')
+
+        vk_session = VkApi(login=username, password=password, config_filename='config.json',
+                           captcha_handler=self.captcha_handler)
+        vk_session.auth()
+        return vk_session

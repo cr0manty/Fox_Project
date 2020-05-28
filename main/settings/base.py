@@ -24,6 +24,10 @@ SECRET_KEY = 'u8u3^=wib$bb9eld#i+nxxv3)%7+%1^a!j$!t1-klhdhcu+twf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+USE_REDIS = True
+
+TELEGRAM_BOT_ENABLE = True
+
 ALLOWED_HOSTS = []
 
 # Application definition

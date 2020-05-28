@@ -1,8 +1,15 @@
 from django.urls import reverse
 from rest_framework import serializers
+from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 
 from home.models import MyApp, AppVersions
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = 'page_size'
+    max_page_size = 25
 
 
 class UserSerializer(serializers.ModelSerializer):

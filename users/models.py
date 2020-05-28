@@ -4,7 +4,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 from core.models import Log
-from core.utils import get_vk_auth
 
 
 class User(AbstractUser):
@@ -20,16 +19,6 @@ class User(AbstractUser):
             img = urllib.request.urlopen(self.image.name)
             self.image.save(name, img, save=True)
         super().save(*args, **kwargs)
-
-    def set_vk_info(self, data):
-        self.vk_login = data.get('vk_login', self.vk_login)
-        self.vk_password = data.get('vk_password', self.vk_password)
-        try:
-            get_vk_auth(self)
-            self.can_use_vk = True
-        except Exception as e:
-            Log.objects.create(exception=str(e), additional_text="Cant't connect to vk", from_user=self.username)
-        super().save()
 
     def update(self, data):
         password = data.get('password', None)

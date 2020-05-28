@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import django_rq
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
@@ -10,9 +11,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from vk_api import VkApi
 
+from core.models import VKAuthMixin
 from home.models import MyApp
-from users.tasks import update_users_song_list
+from songs.models import update_user_songs
 from .serializers import UserSerializer, MyAppSerializer
 
 User = get_user_model()
@@ -54,5 +57,35 @@ class UserRegistration(APIView):
 
 class SignInView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        update_users_song_list.delay()
+        if settings.USE_REDIS and request.data.get('username'):
+            try:
+                user = User.objects.get(username=request.data['username'], can_use_vk=True)
+                update_user_songs.delay(user=user)
+            except User.DoesNotExist:
+                pass
         return super().post(request, *args, **kwargs)
+
+
+class SignInVkView(APIView, VKAuthMixin):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not username or not password:
+            return Response('Bad', status=403)
+
+        self.try_auth(request.POST, username, password)
+
+        if self.captcha_url:
+            return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
+
+        user.vk_login = username
+        user.vk_password = password
+        user.can_use_vk = True
+        user.save()
+
+        return Response('Success', status=201)

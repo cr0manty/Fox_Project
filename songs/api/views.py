@@ -4,16 +4,19 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
-from django.utils.timezone import now, timedelta
+from django.utils.timezone import now
 from django.db.models import Q
+from vk_api import VkApi
+from vk_audio import audio
 
+from api.serializers import StandardResultsSetPagination
+from core.utils import get_vk_songs
 from core.views import AmountModelViewSet
 from .serializers import SongListSerializer
 from songs.models import Song
 
 from api.models import IsFriend
-from core.models import Log
-from core.utils import get_vk_auth, get_vk_songs
+from core.models import Log, VKAuthMixin
 
 
 class SearchSongsView(viewsets.ModelViewSet):
@@ -74,11 +77,12 @@ class AddSongFromUser(APIView):
             return Response(status=404)
 
 
-class UserSongListAPIView(AmountModelViewSet):
+class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
     queryset = Song.objects.all().order_by('song_id')
     serializer_class = SongListSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_filter_query(self):
         song_id = self.request.GET.get('song_id', None)
@@ -89,45 +93,45 @@ class UserSongListAPIView(AmountModelViewSet):
         return query
 
     def create(self, request, *args, **kwargs):
+
         user = request.user
         try:
-            vk_session = get_vk_auth(user)
-            audio_list = get_vk_songs(vk_session)
+            vk_session = self.try_auth(request.POST, user.vk_login, user.vk_password)
+            if self.captcha_url:
+                return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
+
+            audio_obj = audio(vk_session)
+            audio_list = audio_obj.get()
         except Exception as e:
             err_text = 'Cant connect to vk server'
             Log.objects.create(exception=str(e), additional_text=err_text, from_user=user.username)
             return Response(err_text, status=400)
 
-        songs_added = {
-            'added': 0,
-            'updated': 0,
-        }
-
         for track in audio_list:
             try:
                 try:
-                    song = Song.objects.get(song_id=track.get('id'))
+                    song = Song.objects.get(song_id=track.id)
                     if user not in song.users_ignore.all():
                         song.users.add(user)
-                        songs_added['updated'] += 1
-                    song.download = track['url']
+                    song.download = track.url
                     song.updated_at = now()
                     song.save()
                 except Song.DoesNotExist:
                     song = Song.objects.create(
-                        song_id=track.get('id'),
-                        artist=track.get('artist'),
-                        title=track.get('title'),
-                        duration=track.get('duration'),
-                        download=track.get('url'),
+                        song_id=track.id,
+                        artist=track.artist,
+                        title=track.title,
+                        image=track.image,
+                        full_id=track.full_id,
+                        duration=track.duration,
+                        download=track.url,
                     )
-                    song.users.add(user)
                     song.save()
-                    songs_added['added'] += 1
+                    song.users.add(user)
             except Exception as e:
                 Log.objects.create(exception=str(e), from_user=user.username)
 
-        return Response(songs_added, status=201)
+        return Response('Updated', status=201)
 
 
 class AddNewLinkSongs(viewsets.ModelViewSet):

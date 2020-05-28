@@ -103,4 +103,5 @@ def set_webhook(request=None):
         return Response(status=status.HTTP_200_OK)
 
 
-set_webhook()
+if settings.TELEGRAM_BOT_ENABLE:
+    set_webhook()
