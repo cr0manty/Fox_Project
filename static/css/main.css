@@ -171,6 +171,15 @@ footer p {
         --icon-block-size: 19rem;
         --icon-size: 19rem;
     }
+
+    .main-img-block {
+        height: 200px;
+        margin: 2rem 3rem 2rem 3rem;
+    }
+
+    .downloads img {
+        --download-height: 2.5rem;
+    }
 }
 
 
