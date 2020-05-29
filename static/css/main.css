@@ -178,6 +178,11 @@ footer p {
     }
 }
 
+@media (max-width: 1130px) {
+    .main-img-block {
+        height: 220px;
+    }
+}
 
 @media (max-width: 1130px) {
     footer a {
@@ -238,6 +243,12 @@ footer p {
     .downloads img {
         --download-height: 1.8rem;
         --download-width: 4.5rem;
+    }
+}
+
+@media (max-width: 735px) {
+    .main-img-block {
+        height: 220px;
     }
 }
 
