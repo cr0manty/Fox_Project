@@ -7,11 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 
 from django.utils.timezone import now
 from django.db.models import Q
-from vk_api import VkApi
 from vk_audio import audio
 
 from api.serializers import StandardResultsSetPagination
-from core.utils import get_vk_songs
 from core.views import AmountModelViewSet
 from .serializers import SongListSerializer
 from songs.models import Song
@@ -83,7 +81,7 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
     authentication_classes = (TokenAuthentication,)
     queryset = Song.objects.all().order_by('song_id')
     serializer_class = SongListSerializer
-    pagination_class = StandardResultsSetPagination
+    # pagination_class = StandardResultsSetPagination
 
     def get_filter_query(self):
         song_id = self.request.GET.get('song_id', None)
