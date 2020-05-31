@@ -93,5 +93,7 @@ def update_user_songs(user):
                     )
                     song.save()
                     song.users.add(user)
+                user.last_songs_update = timezone.now()
+                user.save()
             except Exception as e:
                 RQLog.objects.create(exception_text=str(e), from_user=user.username)

@@ -134,7 +134,8 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
                     song.users.add(user)
             except Exception as e:
                 Log.objects.create(exception=str(e), from_user=user.username)
-
+        user.last_songs_update = timezone.now()
+        user.save()
         return Response('Updated', status=201)
 
 
