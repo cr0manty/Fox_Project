@@ -1,6 +1,7 @@
+import os
 from datetime import datetime
 
-import django_rq
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -12,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from vk_api import VkApi
+from uuid import uuid4
 
 from core.models import VKAuthMixin
 from home.models import MyApp
@@ -78,10 +80,22 @@ class SignInVkView(APIView, VKAuthMixin):
         if not username or not password:
             return Response('Bad', status=403)
 
-        self.try_auth(request.POST, username, password)
+        if not self.try_auth(request.POST, username, password):
+            return Response('Bad', status=403)
 
         if self.captcha_url:
-            return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
+            dir_name = 'media/captcha'
+            if not os.path.exists(dir_name):
+                os.mkdir(dir_name)
+
+            img_data = requests.get(self.captcha_url)
+            filename = '{}/username_{}.jpeg'.format(dir_name, uuid4())
+
+            with open(filename, 'wb') as handler:
+                handler.write(img_data.content)
+            protocol = 'https' if request.is_secure == True else 'http'
+            file_url = '{}://{}/{}'.format(protocol, request.META['HTTP_HOST'], filename)
+            return Response({'url': file_url, 'sid': self.captcha_sid}, status=302)
 
         user.vk_login = username
         user.vk_password = password

@@ -75,10 +75,14 @@ class VKAuthMixin(object):
             self.captcha_url, self.captcha_sid = captcha.get_url(), captcha.sid
 
     def try_auth(self, post, username, password):
-        self.captcha_key = post.get('captcha')
-        self.captcha_sid = post.get('sid')
+        try:
+            self.captcha_key = post.get('captcha')
+            self.captcha_sid = post.get('sid')
 
-        vk_session = VkApi(login=username, password=password, config_filename='config.json',
-                           captcha_handler=self.captcha_handler)
-        vk_session.auth()
-        return vk_session
+            vk_session = VkApi(login=username, password=password, config_filename='config.json',
+                               captcha_handler=self.captcha_handler)
+            vk_session.auth()
+            return vk_session
+        except Exception as e:
+            Log.objects.create(exception=e, additional_text=username)
+            return None
