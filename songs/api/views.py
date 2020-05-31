@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
@@ -93,8 +94,11 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
         return query
 
     def create(self, request, *args, **kwargs):
-
         user = request.user
+
+        if user.last_songs_update >= timezone.now() - timezone.timedelta(hours=3):
+            return Response(status=304)
+
         try:
             vk_session = self.try_auth(request.POST, user.vk_login, user.vk_password)
             if self.captcha_url:

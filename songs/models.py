@@ -61,6 +61,7 @@ class SongsUpdateRequest(models.Model):
         except SongsUpdateRequest.DoesNotExist:
             self.update()
 
+
 @job
 def update_user_songs(user):
     try:
@@ -74,21 +75,23 @@ def update_user_songs(user):
         for track in song_list:
             try:
                 try:
-                    song = Song.objects.get(song_id=track.get('id'))
+                    song = Song.objects.get(song_id=track.id)
                     if user not in song.users_ignore.all():
                         song.users.add(user)
-                    song.download = track['url']
+                    song.download = track.url
                     song.updated_at = timezone.now()
                     song.save()
                 except Song.DoesNotExist:
                     song = Song.objects.create(
-                        song_id=track.get('id'),
-                        artist=track.get('artist'),
-                        name=track.get('title'),
-                        duration=track.get('duration'),
-                        download=track.get('url'),
+                        song_id=track.id,
+                        artist=track.artist,
+                        title=track.title,
+                        image=track.image,
+                        full_id=track.full_id,
+                        duration=track.duration,
+                        download=track.url,
                     )
-                    song.users.add(user)
                     song.save()
+                    song.users.add(user)
             except Exception as e:
-                RQLog.objects.create(exception_text=str(e), from_user=user.username, is_exception=True)
+                RQLog.objects.create(exception_text=str(e), from_user=user.username)

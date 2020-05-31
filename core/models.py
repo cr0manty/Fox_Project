@@ -69,10 +69,10 @@ class VKAuthMixin(object):
     def captcha_handler(self, captcha):
         if self.captcha_key and self.captcha_sid:
             captcha.sid = self.captcha_sid
+            self.captcha_key, self.captcha_sid = None, None
             return captcha.try_again(self.captcha_key)
         else:
-            self.captcha_url = captcha.get_url()
-            self.captcha_sid = captcha.sid
+            self.captcha_url, self.captcha_sid = captcha.get_url(), captcha.sid
 
     def try_auth(self, post, username, password):
         self.captcha_key = post.get('captcha')
