@@ -88,4 +88,4 @@ class SignInVkView(APIView, VKAuthMixin):
         user.can_use_vk = True
         user.save()
 
-        return Response('Success', status=201)
+        return Response('Success', status=200)
