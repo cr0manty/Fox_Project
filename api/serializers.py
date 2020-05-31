@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 
-from home.models import MyApp, AppVersions
+from home.models import MyApp
 
 
 class StandardResultsSetPagination(PageNumberPagination):

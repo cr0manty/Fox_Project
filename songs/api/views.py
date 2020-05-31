@@ -95,48 +95,45 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
 
     def create(self, request, *args, **kwargs):
         user = request.user
-
-        if user.last_songs_update >= timezone.now() - timezone.timedelta(hours=3):
-            return Response(status=304)
-
-        try:
-            vk_session = self.try_auth(request.POST, user.vk_login, user.vk_password)
-            if self.captcha_url:
-                return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
-
-            audio_obj = audio(vk_session)
-            audio_list = audio_obj.get()
-        except Exception as e:
-            err_text = 'Cant connect to vk server'
-            Log.objects.create(exception=str(e), additional_text=err_text, from_user=user.username)
-            return Response(err_text, status=400)
-
-        for track in audio_list:
+        if user.last_songs_update <= timezone.now() - timezone.timedelta(hours=3):
             try:
-                try:
-                    song = Song.objects.get(song_id=track.id)
-                    if user not in song.users_ignore.all():
-                        song.users.add(user)
-                    song.download = track.url
-                    song.updated_at = now()
-                    song.save()
-                except Song.DoesNotExist:
-                    song = Song.objects.create(
-                        song_id=track.id,
-                        artist=track.artist,
-                        title=track.title,
-                        image=track.image,
-                        full_id=track.full_id,
-                        duration=track.duration,
-                        download=track.url,
-                    )
-                    song.save()
-                    song.users.add(user)
+                vk_session = self.try_auth(request.POST, user.vk_login, user.vk_password)
+                if self.captcha_url:
+                    return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
+
+                audio_obj = audio(vk_session)
+                audio_list = audio_obj.get()
             except Exception as e:
-                Log.objects.create(exception=str(e), from_user=user.username)
-        user.last_songs_update = timezone.now()
-        user.save()
-        return Response('Updated', status=201)
+                err_text = 'Cant connect to vk server'
+                Log.objects.create(exception=str(e), additional_text=err_text, from_user=user.username)
+                return Response(err_text, status=400)
+
+            for track in audio_list:
+                try:
+                    try:
+                        song = Song.objects.get(song_id=track.id)
+                        if user not in song.users_ignore.all():
+                            song.users.add(user)
+                        song.download = track.url
+                        song.updated_at = now()
+                        song.save()
+                    except Song.DoesNotExist:
+                        song = Song.objects.create(
+                            song_id=track.id,
+                            artist=track.artist,
+                            title=track.title,
+                            image=track.image,
+                            full_id=track.full_id,
+                            duration=track.duration,
+                            download=track.url,
+                        )
+                        song.save()
+                        song.users.add(user)
+                except Exception as e:
+                    Log.objects.create(exception=str(e), from_user=user.username)
+            user.last_songs_update = timezone.now()
+            user.save()
+        return self.list(request, *args, **kwargs)
 
 
 class AddNewLinkSongs(viewsets.ModelViewSet):
