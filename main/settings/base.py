@@ -26,7 +26,7 @@ DEBUG = False
 
 USE_REDIS = True
 
-TELEGRAM_BOT_ENABLE = True
+TELEGRAM_BOT_ENABLE = False
 
 ALLOWED_HOSTS = []
 
@@ -202,3 +202,4 @@ CKEDITOR_SETTINGS = {
 }
 
 YOUTUBE_REGEX = r'(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?'
+ENABLE_FOXTUBE_BOT = False
