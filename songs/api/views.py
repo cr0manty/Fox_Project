@@ -81,7 +81,7 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
     authentication_classes = (TokenAuthentication,)
     queryset = Song.objects.all().order_by('song_id')
     serializer_class = SongListSerializer
-    # pagination_class = StandardResultsSetPagination
+    pagination_class = StandardResultsSetPagination
 
     def get_filter_query(self):
         song_id = self.request.GET.get('song_id', None)
@@ -95,7 +95,7 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
         user = request.user
         if user.last_songs_update <= timezone.now() - timezone.timedelta(hours=3):
             try:
-                vk_session = self.try_auth(request.POST, user.vk_login, user.vk_password)
+                vk_session = self.try_auth(request.POST, user.vk_login, token=user.auth_token)
                 if self.captcha_url:
                     return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
 
