@@ -65,8 +65,8 @@ class SongsUpdateRequest(models.Model):
 @job
 def update_user_songs(user):
     try:
-        vk_session = VkApi(login=user.vk_login, password=user.vk_password, config_filename='config.json')
-        vk_session.auth()
+        vk_session = VkApi(login=user.vk_login, password=user.vk_auth_token, config_filename='config.json')
+        vk_session.auth(token_only=True)
         audio_obj = audio(vk_session)
         song_list = audio_obj.get()
     except Exception as e:

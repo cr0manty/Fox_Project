@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
             'first_name', 'last_name'
         )}),
         ('VK Data', {'fields': (
-            'user_id', 'vk_login', 'can_use_vk', 'vk_password'
+            'user_id', 'vk_login', 'can_use_vk', 'vk_auth_token'
         )}),
         ('Image', {'fields': (
             'image',

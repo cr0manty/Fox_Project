@@ -9,7 +9,7 @@ from core.models import Log
 class User(AbstractUser):
     user_id = models.IntegerField(unique=True, null=True, blank=True)
     vk_login = models.CharField(max_length=255, null=True, blank=True)
-    vk_password = models.CharField(max_length=255, null=True, blank=True)
+    vk_auth_token = models.CharField(max_length=255, blank=True, null=True)
     can_use_vk = models.BooleanField(default=False)
     image = models.ImageField(upload_to='user_image', default='user-default.png')
     last_songs_update = models.DateTimeField(auto_now_add=True)
