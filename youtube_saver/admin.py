@@ -11,11 +11,12 @@ class YoutubePostsAdmin(admin.ModelAdmin):
 
 @admin.register(DownloadYoutubeMP3ShortLink)
 class YoutubePostsAdmin(admin.ModelAdmin):
+    list_display = ('slug', 'username', 'created_at')
     readonly_fields = ('created_at',)
     list_filter = ('created_at',)
 
-    # def has_add_permission(self, request):
-    #     return False
+    def has_add_permission(self, request):
+        return False
 
     def has_change_permission(self, request, obj=None):
         return False

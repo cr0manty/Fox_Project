@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny
 
 from telebot import TeleBot, types
 
-from core.models import TelegramBotLogs
+from core.models import TelegramBotLogs, TelegramLogs
 from youtube_saver.models import YoutubePosts, DownloadYoutubeMP3ShortLink
 from youtube_saver.serializers import YoutubePostsSerializer, YoutubeFormatsSerializer
 
@@ -53,6 +53,7 @@ class TelegramBotView(APIView):
     def post(self, request, *args, **kwargs):
         json_str = request.body.decode('UTF-8')
         update = types.Update.de_json(json_str)
+        TelegramLogs.create_object(update)
         bot.process_new_updates([update])
         return Response({'code': 200})
 

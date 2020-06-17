@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Log, RQLog, TelegramBotLogs
+from .models import Log, RQLog, TelegramBotLogs, TelegramLogs
 
 
 class ReadOnlyAdminMixin(object):
@@ -27,3 +27,9 @@ class RQLogAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 class TelegramBotLogsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = ('username', 'created_at')
     list_filter = ('log_type', 'language')
+
+
+@admin.register(TelegramLogs)
+class TelegramLogsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
+    list_display = ('username', 'created_at')
+    list_filter = ('created_at', 'language', 'is_group')
