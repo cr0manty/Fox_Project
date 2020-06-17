@@ -1,10 +1,10 @@
-import datetime
 import re
 import uuid
 
 import youtube_dl
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -54,19 +54,18 @@ class TelegramBotView(APIView):
         json_str = request.body.decode('UTF-8')
         update = types.Update.de_json(json_str)
         bot.process_new_updates([update])
-
         return Response({'code': 200})
 
 
 @bot.message_handler(commands=['active'])
 def active_links(message):
-    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    yesterday = timezone.now() - timezone.timedelta(days=1)
     links = DownloadYoutubeMP3ShortLink.objects.filter(username=message.from_user.username, created_at__gt=yesterday)
     msg = ''
     
     for link in links:
-        time_left = link.created_at - yesterday
-        msg += '{}\n{}\nExpires in: {}\n\n'.format(link.title, link.get_absolute_url(), str(time_left))
+        time_left = str(link.created_at - yesterday).split('.')[0]
+        msg += '{}\n{}\nExpires in: {}\n\n'.format(link.title, link.get_absolute_url(), time_left)
 
     if not msg:
         msg = 'No active links'
@@ -114,7 +113,7 @@ def create_short_url(result, song_url, username, slug_length=8):
     slug = str(uuid.uuid4())[:slug_length]
     try:
         link = DownloadYoutubeMP3ShortLink.objects.get(slug=slug)
-        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        yesterday = timezone.now() - timezone.timedelta(days=1)
         if link.created_at <= yesterday:
             link.delete()
         return create_short_url(result, song_url, username, slug_length + 2)
