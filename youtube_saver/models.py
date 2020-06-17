@@ -24,3 +24,17 @@ class YoutubePosts(models.Model):
     class Meta:
         verbose_name = 'YoutubePost'
         verbose_name_plural = 'YoutubePosts'
+
+
+class DownloadYoutubeMP3ShortLink(models.Model):
+    slug = models.SlugField(null=True, blank=True)
+    duration = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    url = models.TextField()
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.slug
+
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)

@@ -20,9 +20,10 @@ class LogAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 
 @admin.register(RQLog)
 class RQLogAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
-    pass
+    list_filter = ('is_exception',)
 
 
 @admin.register(TelegramBotLogs)
 class TelegramBotLogsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = ('username', 'created_at')
+    list_filter = ('log_type', 'language')

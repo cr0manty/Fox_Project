@@ -1,7 +1,12 @@
 import re
+import uuid
+
 import youtube_dl
 
 from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,9 +16,8 @@ from rest_framework.permissions import AllowAny
 from telebot import TeleBot, types
 
 from core.models import TelegramBotLogs
-from youtube_saver.models import YoutubePosts
+from youtube_saver.models import YoutubePosts, DownloadYoutubeMP3ShortLink
 from youtube_saver.serializers import YoutubePostsSerializer, YoutubeFormatsSerializer
-from youtube_saver.utils import send_telegram_audio
 
 bot = TeleBot(settings.TELEGRAM_BOT_YOUTUBE_TOKEN)
 
@@ -64,6 +68,7 @@ def parse_message(message):
             with youtube_dl.YoutubeDL(settings.YOUTUBE_DOWNLOAD_PARAMS) as ydl:
                 url_param = urls[0].find('&')
                 result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
+                bot.send_chat_action(message.chat.id, action='typing')
                 true_song = []
 
                 for result_format in result['formats']:
@@ -81,13 +86,29 @@ def parse_message(message):
 
                 if true_song:
                     best_audio = sorted(true_song, key=lambda item: item['format'])[-1]['url']
-                    send_telegram_audio(bot, message, best_audio, result['title'], result['duration'])
+                    url = create_short_url(result, best_audio)
+                    bot.send_message(message.chat.id, url)
+                    TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=3))
                 else:
                     print('Not Found')
                     TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
     except Exception as e:
         print(e)
         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e))
+
+
+def create_short_url(result, song_url, slug_length=8):
+    slug = str(uuid.uuid4())[:slug_length]
+    try:
+        link = DownloadYoutubeMP3ShortLink.objects.get(slug=slug)
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        if link.created_at <= yesterday:
+            link.delete()
+        return create_short_url(result, song_url, slug_length + 2)
+    except DownloadYoutubeMP3ShortLink.DoesNotExist:
+        DownloadYoutubeMP3ShortLink.objects.create(url=song_url, title=result.get('title'),
+                                                   duration=result.get('duration'), slug=slug)
+        return '{}://{}/{}'.format(settings.PROTOCOL, settings.DOMAIN, reverse('short_url', args=(slug,)))
 
 
 def set_webhook(request=None):
