@@ -32,12 +32,10 @@ class DownloadYoutubeMP3ShortLink(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     url = models.TextField()
     created_at = models.DateField(auto_now_add=True)
+    original_url = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.slug
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'MP3 Short Link'

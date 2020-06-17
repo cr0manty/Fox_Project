@@ -88,6 +88,7 @@ def parse_message(message):
                     best_audio = sorted(true_song, key=lambda item: item['format'])[-1]['url']
                     url = create_short_url(result, best_audio)
                     bot.send_message(message.chat.id, url)
+                    bot.send_message(message.chat.id, '')
                     TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=3))
                 else:
                     print('Not Found')
@@ -106,9 +107,9 @@ def create_short_url(result, song_url, slug_length=8):
             link.delete()
         return create_short_url(result, song_url, slug_length + 2)
     except DownloadYoutubeMP3ShortLink.DoesNotExist:
-        DownloadYoutubeMP3ShortLink.objects.create(url=song_url, title=result.get('title'),
+        DownloadYoutubeMP3ShortLink.objects.create(url=song_url, title=result.get('title'), original_url=song_url,
                                                    duration=result.get('duration'), slug=slug)
-        return '{}://{}/{}'.format(settings.PROTOCOL, settings.DOMAIN, reverse('short_url', args=(slug,)))
+        return '{}://{}{}'.format(settings.PROTOCOL, settings.DOMAIN, reverse('short_url', args=(slug,)))
 
 
 def set_webhook(request=None):
