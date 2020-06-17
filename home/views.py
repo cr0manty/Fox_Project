@@ -1,5 +1,6 @@
+import datetime
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
 from django.views import View
 
 from home.models import MyApp
@@ -25,6 +26,6 @@ class AppView(View):
 
 
 def url_shorter(request, slug):
-    yesterday = timezone.now() - timezone.timedelta(days=1)
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     link = get_object_or_404(DownloadYoutubeMP3ShortLink, slug=slug, created_at__gt=yesterday)
     return redirect(link.url)

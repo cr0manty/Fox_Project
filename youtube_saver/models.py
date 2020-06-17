@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class YoutubePosts(models.Model):
@@ -31,8 +33,12 @@ class DownloadYoutubeMP3ShortLink(models.Model):
     duration = models.IntegerField(null=True, blank=True)
     title = models.CharField(max_length=255, blank=True, null=True)
     url = models.TextField()
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     original_url = models.TextField(blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+
+    def get_absolute_url(self):
+        return '{}://{}{}'.format(settings.PROTOCOL, settings.DOMAIN, reverse('short_url', args=(self.slug,)))
 
     def __str__(self):
         return self.slug
