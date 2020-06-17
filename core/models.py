@@ -26,7 +26,8 @@ class TelegramBotLogs(models.Model):
     LOG_TYPE = (
         (0, 'Error'),
         (1, 'Not Sended'),
-        (2, 'Not Found')
+        (2, 'Not Found'),
+        (3, 'Success')
     )
 
     chat_id = models.IntegerField(blank=True)
