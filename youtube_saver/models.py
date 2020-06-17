@@ -22,8 +22,8 @@ class YoutubePosts(models.Model):
         return self.title or super().__str__()
 
     class Meta:
-        verbose_name = 'YoutubePost'
-        verbose_name_plural = 'YoutubePosts'
+        verbose_name = 'Youtube Post'
+        verbose_name_plural = 'Youtube Posts'
 
 
 class DownloadYoutubeMP3ShortLink(models.Model):
@@ -38,3 +38,7 @@ class DownloadYoutubeMP3ShortLink(models.Model):
 
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'MP3 Short Link'
+        verbose_name_plural = 'MP3 Short Links'
