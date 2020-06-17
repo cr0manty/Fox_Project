@@ -15,8 +15,16 @@ class StandardResultsSetPagination(PageNumberPagination):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        exclude = ('password', 'user_permissions', 'groups',
-                   'is_active', 'is_superuser', 'last_login')
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+        exclude = ('user_permissions', 'groups', 'is_active',
+                   'is_superuser', 'last_login')
+
+    def create(self, validated_data):
+        return get_user_model().objects.create_user(
+            **validated_data
+        )
 
 
 class MyAppSerializer(serializers.ModelSerializer):

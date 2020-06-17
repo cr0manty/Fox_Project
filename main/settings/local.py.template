@@ -4,12 +4,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+USE_REDIS = False
 TELEGRAM_BOT_ENABLE = False
 TELEGRAM_BOT_YOUTUBE_TOKEN = ''
 
 PROTOCOL = ''
 DOMAIN = ''
-
 
 DATABASES = {
     'default': {

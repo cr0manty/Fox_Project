@@ -105,12 +105,12 @@ class TelegramLogs(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def create_object(json_data):
-        is_group = json_data.message.chat.type == 'group'
+    def create_object(message):
+        is_group = message.chat.type == 'group'
         try:
-            TelegramLogs.objects.get(chat_id=json_data.message.chat.id, user_id=json_data.message.from_user.id,
+            TelegramLogs.objects.get(chat_id=message.chat.id, user_id=message.from_user.id,
                                      is_group=is_group)
         except TelegramLogs.DoesNotExist:
-            TelegramLogs.objects.create(chat_id=json_data.message.chat.id, user_id=json_data.message.from_user.id,
-                                        username=json_data.message.from_user.username, is_group=is_group,
-                                        language=json_data.message.from_user.language_code)
+            TelegramLogs.objects.create(chat_id=message.chat.id, user_id=message.from_user.id,
+                                        username=message.from_user.username, is_group=is_group,
+                                        language=message.from_user.language_code)

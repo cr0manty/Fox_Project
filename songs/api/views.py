@@ -27,8 +27,9 @@ class SearchSongsView(viewsets.ModelViewSet):
         search = self.request.GET.get('search', '')
 
         if search:
+            yesterday = timezone.now() - timezone.timedelta(days=1)
             return Q(Q(artist__istartswith=search) | Q(
-                title__istartswith=search))
+                title__istartswith=search)) & Q(created_at__gte=yesterday)
         return Q()
 
     def get_queryset(self):
@@ -85,7 +86,8 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
 
     def get_filter_query(self):
         song_id = self.request.GET.get('song_id', None)
-        query = Q(users=self.request.user)
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        query = Q(users=self.request.user) & Q(created_at__gte=yesterday)
 
         if song_id is not None:
             return query & Q(song_id=song_id)

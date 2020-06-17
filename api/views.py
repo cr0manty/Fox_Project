@@ -40,19 +40,11 @@ class CheckAuth(APIView):
 
 class UserRegistration(APIView):
     def post(self, request):
-        VALID_USER_FIELDS = [user.name for user in User._meta.fields]
         serialized = UserSerializer(data=request.data, context={'request': request})
         if serialized.is_valid():
-            user_data = {field: data for (field, data) in request.data.items() if field in VALID_USER_FIELDS}
-            if not user_data.get('vk_login', None):
-                user_data.update({'vk_login': user_data.get('username')})
-            user = User.objects.create_user(
-                **user_data
-            )
-            serialized = UserSerializer(instance=user, context={'request': request})
+            serialized.save()
             return Response(serialized.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignInView(ObtainAuthToken):
