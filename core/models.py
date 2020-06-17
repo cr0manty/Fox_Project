@@ -99,7 +99,6 @@ class VKAuthMixin(object):
 class TelegramLogs(models.Model):
     chat_id = models.IntegerField()
     is_group = models.BooleanField(default=False)
-    chat_name = models.CharField(max_length=255, null=True, blank=True)
     user_id = models.IntegerField(null=True, blank=True)
     username = models.CharField(max_length=255)
     language = models.CharField(max_length=16, null=True, blank=True)
@@ -112,7 +111,6 @@ class TelegramLogs(models.Model):
             TelegramLogs.objects.get(chat_id=json_data.message.chat.id, user_id=json_data.message.from_user.id,
                                      is_group=is_group)
         except TelegramLogs.DoesNotExist:
-            chat_name = json_data.message.chat.title
             TelegramLogs.objects.create(chat_id=json_data.message.chat.id, user_id=json_data.message.from_user.id,
                                         username=json_data.message.from_user.username, is_group=is_group,
-                                        chat_name=chat_name, language=json_data.message.from_user.language_code)
+                                        language=json_data.message.from_user.language_code)
