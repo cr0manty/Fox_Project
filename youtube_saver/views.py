@@ -62,7 +62,7 @@ def active_links(message):
     yesterday = timezone.now() - timezone.timedelta(days=1)
     links = DownloadYoutubeMP3ShortLink.objects.filter(username=message.from_user.username, created_at__gt=yesterday)
     msg = ''
-    
+
     for link in links:
         time_left = str(link.created_at - yesterday).split('.')[0]
         msg += '{}\n{}\nExpires in: {}\n\n'.format(link.title, link.get_absolute_url(), time_left)
@@ -89,6 +89,7 @@ def parse_message(message):
                             'format': result_format['format_id'],
                             'url': result_format['url']
                         })
+
                     if result_format['format_note'].startswith('DASH') and result_format['format_note'].find(
                             'audio') != -1:
                         true_song.append({
@@ -97,30 +98,43 @@ def parse_message(message):
                         })
 
                 if true_song:
-                    best_audio = sorted(true_song, key=lambda item: item['format'])[-1]['url']
+                    best_audio = sorted(true_song, key=lambda item: item['format'])[-1]
                     url = create_short_url(result, best_audio, message.from_user.username)
                     bot.send_message(message.chat.id,
                                      '{} \n\nThis link is open just for 24 hours'.format(url.get_absolute_url()))
                 else:
                     print('Not Found')
+                    bot.send_message(message.chat.id, 'Not found')
                     TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, log_type=2))
     except Exception as e:
         print(e)
         TelegramBotLogs.objects.create(**TelegramBotLogs.get_kwargs(message, e=e))
 
 
-def create_short_url(result, song_url, username, slug_length=8):
+def create_short_url(result, song, username, slug_length=8):
+    now = timezone.now()
+    try:
+        link = DownloadYoutubeMP3ShortLink.objects.get(username=username, video_slug=result['channel_id'])
+        link.created_at = now
+        link.url = song.get('url')
+        link.save()
+        return link
+    except DownloadYoutubeMP3ShortLink.DoesNotExist:
+        pass
+    
     slug = str(uuid.uuid4())[:slug_length]
     try:
         link = DownloadYoutubeMP3ShortLink.objects.get(slug=slug)
-        yesterday = timezone.now() - timezone.timedelta(days=1)
+        yesterday = now - timezone.timedelta(days=1)
         if link.created_at <= yesterday:
             link.delete()
-        return create_short_url(result, song_url, username, slug_length + 2)
+        return create_short_url(result, song, username, slug_length + 2)
     except DownloadYoutubeMP3ShortLink.DoesNotExist:
-        return DownloadYoutubeMP3ShortLink.objects.create(url=song_url, title=result.get('title'),
-                                                          original_url=song_url, slug=slug, username=username,
-                                                          duration=result.get('duration'))
+        return DownloadYoutubeMP3ShortLink.objects.create(url=song.get('url'), title=result.get('title'),
+                                                          original_url=result['webpage_url'], 
+                                                          slug=slug, username=username,
+                                                          duration=result.get('duration'),
+                                                          video_slug=result['channel_id'])
 
 
 def set_webhook(request=None):

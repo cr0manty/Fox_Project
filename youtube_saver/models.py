@@ -29,7 +29,8 @@ class YoutubePosts(models.Model):
 
 
 class DownloadYoutubeMP3ShortLink(models.Model):
-    slug = models.SlugField(null=True, blank=True)
+    slug = models.SlugField()
+    video_slug = models.CharField(max_length=255,blank=True, null=True)
     duration = models.IntegerField(null=True, blank=True)
     title = models.CharField(max_length=255, blank=True, null=True)
     url = models.TextField()
