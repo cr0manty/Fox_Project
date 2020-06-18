@@ -282,3 +282,6 @@ footer p {
     color: rgba(241, 90, 36, 0.87);
 }
 
+.not-found {
+    height: 200px;
+}

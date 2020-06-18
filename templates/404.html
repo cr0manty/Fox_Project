@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <object type="image/svg+xml" id="not-found" data="{% static "images/404_fox.svg" %}">
+        <img src="{% static "images/404_fox.png" %}" alt="" id="not-found-png">
+    </object>
+    <script>
+        $(document).ready(function () {
+            let notFound = $('#not-found');
+            notFound.attr('height', window.innerHeight - 300);
+            notFound.attr('width', window.outerWidth);
+            notFound.css('margin-top', 150);
+            let notFoundPng = $('#not-found-png');
+            notFoundPng.attr('height', window.innerHeight - 300);
+            notFoundPng.attr('width', window.outerWidth);
+            notFoundPng.css('margin-top', 150);
+        })
+    </script>
+{% endblock content %}
+{% block footer %}
+{% endblock footer %}

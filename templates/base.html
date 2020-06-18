@@ -12,14 +12,16 @@
 <div class="content">
     {% block content %}{% endblock content %}
 </div>
-<footer class="navbar navbar-default navbar-fixed-bottom justify-content-between">
-    <div class="container">
-        <a href="https://github.com/cr0manty" target="_blank">GitHub</a>
-        {% if request.user.is_staff %}
-            <a href="{% url 'admin:index' %}" id="admin-link">Admin</a>
-        {% endif %}
-        <a href="mailto:denys.dudka.mail@gmail.com">© {% now 'Y' %} Red Fox Project</a>
-    </div>
-</footer>
+{% block footer %}
+    <footer class="navbar navbar-default navbar-fixed-bottom justify-content-between">
+        <div class="container">
+            <a href="https://github.com/cr0manty" target="_blank">GitHub</a>
+            {% if request.user.is_staff %}
+                <a href="{% url 'admin:index' %}" id="admin-link">Admin</a>
+            {% endif %}
+            <a href="mailto:denys.dudka.mail@gmail.com">© {% now 'Y' %} Red Fox Project</a>
+        </div>
+    </footer>
+{% endblock footer %}
 </body>
 </html>
