@@ -9,7 +9,7 @@ from core.models import TelegramBotLogs
 from youtube_saver.models import DownloadYoutubeMP3ShortLink
 
 
-def get_download_url(message):
+def get_download_url(message, func=None, **kwargs):
     try:
         urls = re.findall(settings.YOUTUBE_REGEX, message.text)
         if urls:
@@ -17,6 +17,9 @@ def get_download_url(message):
                 url_param = urls[0].find('&')
                 result = ydl.extract_info(urls[0][:url_param] if url_param != -1 else urls[0], download=False)
                 true_song = []
+
+                if func is not None:
+                    func(**kwargs)
 
                 for result_format in result['formats']:
                     if result_format['format_note'] == 'tiny':

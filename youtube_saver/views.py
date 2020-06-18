@@ -74,9 +74,7 @@ def active_links(message):
 
 @bot.message_handler()
 def parse_message(message):
-    bot.send_chat_action(message.chat.id, action='typing')
-
-    text = get_download_url(message)
+    text = get_download_url(message, func=bot.send_chat_action, chat_id=message.chat.id, action='typing')
     if text is not None:
         bot.send_message(message.chat.id, text)
 
