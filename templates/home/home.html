@@ -13,10 +13,10 @@
                     <div class="image image-btn">
                         <ul class="desc">
                             <li>
-                                <h4>{{ app.title }}</h4>
+                                <h3>{{ app.title }}</h3>
                             </li>
                             <li>
-                                Version:
+                                <strong>Version:</strong>
                                 <span>
                                 {% if app.last_version %}
                                     {{ app.last_version.version }}
@@ -27,7 +27,7 @@
                             </li>
                             {% if app.description %}
                                 <li class="app-description">
-                                    Description:<br>
+                                    <strong>Description:<br></strong>
                                     <span>{{ app.short_description|safe }}</span>
                                 </li>
                             {% endif %}
