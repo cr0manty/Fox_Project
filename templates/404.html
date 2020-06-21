@@ -7,7 +7,7 @@
         <img src="{% static "images/404_fox.png" %}" alt="" id="not-found-png">
     </object>
     <script>
-        $(document).ready(function () {
+        function resize() {
             let notFound = $('#not-found');
             notFound.attr('height', window.innerHeight - 300);
             notFound.attr('width', window.outerWidth);
@@ -16,7 +16,10 @@
             notFoundPng.attr('height', window.innerHeight - 300);
             notFoundPng.attr('width', window.outerWidth);
             notFoundPng.css('margin-top', 150);
-        })
+        }
+
+        $(window).resize(resize);
+        $(document).ready(resize);
     </script>
 {% endblock content %}
 {% block footer %}

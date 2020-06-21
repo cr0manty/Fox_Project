@@ -27,8 +27,8 @@
                             </li>
                             {% if app.description %}
                                 <li class="app-description">
-                                    Description:
-                                    <span>{{ app.description|truncatechars:60 }}</span>
+                                    Description:<br>
+                                    <span>{{ app.short_description|safe }}</span>
                                 </li>
                             {% endif %}
                             {% if app.last_version %}

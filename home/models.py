@@ -26,6 +26,10 @@ class MyApp(models.Model):
         except AppVersions.DoesNotExist:
             return
 
+    @property
+    def short_description(self):
+        return self.description[:60]
+
     def __str__(self):
         return self.title
 
