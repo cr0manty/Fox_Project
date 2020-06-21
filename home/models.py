@@ -36,6 +36,7 @@ class AppVersions(models.Model):
     update_details = models.TextField(default='Your version is out of date, please upgrade to a new version.')
     app = models.ForeignKey(MyApp, on_delete=models.CASCADE, related_name='versions')
     create_date = models.DateTimeField(auto_now_add=True)
+    web_version = models.URLField(blank=True, null=True)
     ios_app = models.URLField(blank=True, null=True)
     android_app = models.URLField(blank=True, null=True)
 
