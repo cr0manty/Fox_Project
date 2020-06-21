@@ -100,7 +100,7 @@ class TelegramLogs(models.Model):
     chat_id = models.IntegerField()
     is_group = models.BooleanField(default=False)
     user_id = models.IntegerField(null=True, blank=True)
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, blank=True, null=True)
     language = models.CharField(max_length=16, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
