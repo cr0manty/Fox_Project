@@ -8,14 +8,15 @@
     </object>
     <script>
         function resize() {
+            let width = $(window).width() - 20;
+            let height = $(window).height() - 300;
+
             let notFound = $('#not-found');
-            notFound.attr('height', window.innerHeight - 300);
-            notFound.attr('width', window.outerWidth);
-            notFound.css('margin-top', 150);
+            notFound.attr('height', height < 150 ? 150 : height);
+            notFound.attr('width', width < 50 ? 50 : width);
             let notFoundPng = $('#not-found-png');
-            notFoundPng.attr('height', window.innerHeight - 300);
-            notFoundPng.attr('width', window.outerWidth);
-            notFoundPng.css('margin-top', 150);
+            notFoundPng.attr('height', height < 150 ? 150 : height);
+            notFoundPng.attr('width', width < 50 ? 50 : width);
         }
 
         $(window).resize(resize);
