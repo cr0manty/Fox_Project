@@ -4,8 +4,8 @@ body {
     --icon-block-size: 25rem;
     --icon-size: 25rem;
     --desc-display: none;
-    --download-height: 2.5rem;
-    --download-width: 6rem;
+    --usage-height: 2.5rem;
+    --usage-width: 6rem;
 }
 
 *, *:before, *:after {
@@ -57,22 +57,22 @@ body {
     --desc-display: block;
 }
 
-.downloads {
+.usage {
     padding: 0;
     display: flex;
     justify-content: space-between;
 }
 
-.downloads img {
-    max-height: var(--download-height);
-    min-height: var(--download-height);
-    max-width: var(--download-width);
-    min-width: var(--download-width);
+.usage img {
+    max-height: var(--usage-height);
+    min-height: var(--usage-height);
+    max-width: var(--usage-width);
+    min-width: var(--usage-width);
     border-radius: 10px;
     overflow: hidden;
 }
 
-.download-links {
+.usage-links {
     position: absolute;
     bottom: 1.5rem;
     width: calc(var(--icon-size) - 5.6rem);
@@ -139,7 +139,7 @@ footer p {
         --icon-size: 20rem;
     }
 
-    .download-links {
+    .usage-links {
         --icon-size: 20rem;
     }
 
@@ -152,8 +152,8 @@ footer p {
         height: 250px;
     }
 
-    .downloads img {
-        --download-height: 2.5rem;
+    .usage img {
+        --usage-height: 2.5rem;
     }
 }
 
@@ -163,7 +163,7 @@ footer p {
         --icon-size: 19rem;
     }
 
-    .download-links {
+    .usage-links {
         --icon-size: 19rem;
     }
 
@@ -173,8 +173,8 @@ footer p {
     }
 
 
-    .downloads img {
-        --download-height: 2.5rem;
+    .usage img {
+        --usage-height: 2.5rem;
     }
 }
 
@@ -189,7 +189,7 @@ footer p {
         font-size: 17px;
     }
 
-    .download-links {
+    .usage-links {
         --icon-size: 18rem;
     }
 
@@ -208,9 +208,15 @@ footer p {
         height: 180px;
     }
 
-    .downloads img {
-        --download-height: 2.3rem;
+    .usage img {
+        --usage-height: 2.3rem;
     }
+}
+
+.single-version a {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -100%);
 }
 
 @media (max-width: 690px) {
@@ -219,7 +225,7 @@ footer p {
         --icon-size: 15rem;
     }
 
-    .download-links {
+    .usage-links {
         --icon-size: 15rem;
     }
 
@@ -240,9 +246,9 @@ footer p {
         display: none;
     }
 
-    .downloads img {
-        --download-height: 1.8rem;
-        --download-width: 4.5rem;
+    .usage img {
+        --usage-height: 1.8rem;
+        --usage-width: 4.5rem;
     }
 }
 
@@ -262,9 +268,9 @@ footer p {
         height: 50px;
     }
 
-    .downloads img {
-        --download-height: 1.5rem;
-        --download-width: 4.5rem;
+    .usage img {
+        --usage-height: 1.5rem;
+        --usage-width: 4.5rem;
     }
 
 }

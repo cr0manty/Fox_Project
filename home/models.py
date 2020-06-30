@@ -27,6 +27,10 @@ class MyApp(models.Model):
             return
 
     @property
+    def version_amount(self):
+        return self.versions.count()
+
+    @property
     def short_description(self):
         return self.description[:60]
 
@@ -43,6 +47,10 @@ class AppVersions(models.Model):
     web_version = models.URLField(blank=True, null=True)
     ios_app = models.URLField(blank=True, null=True)
     android_app = models.URLField(blank=True, null=True)
+
+    @property
+    def type_amount(self):
+        return (self.web_version is not None) + (self.android_app is not None) + (self.ios_app is not None)
 
     def __str__(self):
         return '{} - {}'.format(self.version, self.app.title)

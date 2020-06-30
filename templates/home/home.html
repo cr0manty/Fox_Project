@@ -32,8 +32,8 @@
                                 </li>
                             {% endif %}
                             {% if app.last_version %}
-                                <li class="download-links">
-                                    <div class="downloads">
+                                <li class="usage-links">
+                                    <div class="usage {% if app.last_version.type_amount == 1 %}single-version{% endif %}">
                                         {% if app.last_version.ios_app %}
                                             <a href="{{ app.last_version.ios_app }}" target="_blank">
                                                 <img src="{% static "images/ios-download.png" %}" alt="ios">
