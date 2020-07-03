@@ -23,6 +23,7 @@ class Song(models.Model):
     download = models.TextField(null=True, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+    ignore_time = models.BooleanField(default=False)
 
     def ignore_user(self, user):
         if user in self.users.all():
