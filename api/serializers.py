@@ -45,5 +45,5 @@ class MyAppSerializer(serializers.ModelSerializer):
         return last.version if last else '0.0.0'
 
     def get_update_details(self, obj):
-        last = obj.description
+        last = obj.last_version
         return last.version if last else 'Your version is out of date, please upgrade to a new version'
