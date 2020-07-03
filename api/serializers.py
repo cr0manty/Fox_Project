@@ -37,7 +37,8 @@ class MyAppSerializer(serializers.ModelSerializer):
         fields = ('title', 'update_details', 'version', 'url')
 
     def get_url(self, obj):
-        return reverse('home')
+        request = self.context.get('request')
+        return request.build_absolute_uri(reverse('home'))
 
     def get_version(self, obj):
         last = obj.last_version
