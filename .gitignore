@@ -5,7 +5,7 @@ staticfiles/
 __pycache__/
 
 !media/user-default.png
-!media/player-default.jpg
+!media/player-default.png
 
 local.py
 config.json
