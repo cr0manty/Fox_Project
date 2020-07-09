@@ -71,8 +71,6 @@ class SignInVkView(APIView, VKAuthMixin):
             return Response('Bad', status=403)
 
         session = self.try_auth(request.POST, username, password)
-        if not session:
-            return Response('Bad', status=403)
 
         if self.captcha_url:
             dir_name = 'media/captcha'
@@ -87,6 +85,12 @@ class SignInVkView(APIView, VKAuthMixin):
             protocol = 'https' if request.is_secure == True else 'http'
             file_url = '{}://{}/{}'.format(protocol, request.META['HTTP_HOST'], filename)
             return Response({'url': file_url, 'sid': self.captcha_sid}, status=302)
+
+        # if self.two_step_auth_need:
+        #     return Response({'auth': self.auth_token}, status=303)
+
+        if not session:
+            return Response('Bad', status=403)
 
         user.vk_login = username
         user.vk_auth_token = session.token.get('access_token')

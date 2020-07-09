@@ -1,5 +1,11 @@
+import json
+import random
+
 from django.db import models
-from vk_api import VkApi
+from vk_api import VkApi, TwoFactorError, TWOFACTOR_CODE, BadPassword, CAPTCHA_ERROR_CODE, Captcha, AuthError, \
+    AccountBlocked, PasswordRequired
+from vk_api.utils import search_re, cookies_to_list
+from vk_api.vk_api import RE_AUTH_HASH, RE_CAPTCHAID, RE_LOGIN_HASH
 
 
 class Log(models.Model):
@@ -62,10 +68,144 @@ class TelegramBotLogs(models.Model):
         verbose_name_plural = 'Telegram Bot Logs'
 
 
+class VKApiTwoStep(VkApi):
+
+    def _vk_login(self, captcha_sid=None, captcha_key=None):
+        """ Авторизация ВКонтакте с получением cookies remixsid
+
+        :param captcha_sid: id капчи
+        :type captcha_key: int or str
+
+        :param captcha_key: ответ капчи
+        :type captcha_key: str
+        """
+
+        self.logger.info('Logging in...')
+
+        if not self.password:
+            raise PasswordRequired('Password is required to login')
+
+        self.http.cookies.clear()
+
+        # Get cookies
+        response = self.http.get('https://vk.com/')
+
+        values = {
+            'act': 'login',
+            'role': 'al_frame',
+            '_origin': 'https://vk.com',
+            'utf8': '1',
+            'email': self.login,
+            'pass': self.password,
+            'lg_h': search_re(RE_LOGIN_HASH, response.text)
+        }
+
+        if captcha_sid and captcha_key:
+            self.logger.info(
+                'Using captcha code: {}: {}'.format(
+                    captcha_sid,
+                    captcha_key
+                )
+            )
+
+            values.update({
+                'captcha_sid': captcha_sid,
+                'captcha_key': captcha_key
+            })
+
+        response = self.http.post('https://login.vk.com/', values)
+
+        if 'onLoginCaptcha(' in response.text:
+            self.logger.info('Captcha code is required')
+
+            captcha_sid = search_re(RE_CAPTCHAID, response.text)
+            captcha = Captcha(self, captcha_sid, self._vk_login)
+
+            return self.error_handlers[CAPTCHA_ERROR_CODE](captcha)
+
+        if 'onLoginReCaptcha(' in response.text:
+            self.logger.info('Captcha code is required (recaptcha)')
+
+            captcha_sid = str(random.random())[2:16]
+            captcha = Captcha(self, captcha_sid, self._vk_login)
+
+            return self.error_handlers[CAPTCHA_ERROR_CODE](captcha)
+
+        if 'onLoginFailed(4' in response.text:
+            raise BadPassword('Bad password')
+
+        if 'act=authcheck' in response.text:
+            self.logger.info('Two factor is required')
+
+            response = self.http.get('https://vk.com/login?act=authcheck')
+
+            return self._pass_twofactor(response)
+
+        if self._sid:
+            self.logger.info('Got remixsid')
+
+            self.storage.cookies = cookies_to_list(self.http.cookies)
+            self.storage.save()
+        else:
+            raise AuthError(
+                'Unknown error. Please send bugreport to vk_api@python273.pw'
+            )
+
+        response = self._pass_security_check(response)
+
+        if 'act=blocked' in response.url:
+            raise AccountBlocked('Account is blocked')
+
+    def _pass_twofactor(self, auth_response):
+        """ Двухфакторная аутентификация
+
+        :param auth_response: страница  с приглашением к аутентификации
+        """
+
+        if not self.auth_hash:
+            self.auth_hash = search_re(RE_AUTH_HASH, auth_response.text)
+            return self.auth_hash
+
+        code, remember_device = self.error_handlers[TWOFACTOR_CODE]()
+
+        values = {
+            'act': 'a_authcheck_code',
+            'al': '1',
+            'code': code,
+            'remember': int(remember_device),
+            'hash': self.auth_hash,
+        }
+
+        response = self.http.post('https://vk.com/al_login.php', values)
+        data = json.loads(response.text.lstrip('<!--'))
+        status = data['payload'][0]
+
+        if status == '4':  # OK
+            path = json.loads(data['payload'][1][0])
+            return self.http.get('https://vk.com' + path)
+
+        elif status in [0, '8']:  # Incorrect code
+            return self._pass_twofactor(auth_response)
+
+        elif status == '2':
+            raise TwoFactorError('Recaptcha required')
+
+        raise TwoFactorError('Two factor authentication failed')
+
+
 class VKAuthMixin(object):
     captcha_key = None
     captcha_url = None
     captcha_sid = None
+
+    def auth_handler(self):
+        key = input()
+        return key, False
+        # if self.two_step_auth is not None:
+        #     auth = self.two_step_auth
+        #     self.two_step_auth = None
+        #     return auth, True
+        # self.two_step_auth_need = True
 
     def captcha_handler(self, captcha):
         if self.captcha_key and self.captcha_sid:
@@ -78,17 +218,18 @@ class VKAuthMixin(object):
     def try_auth(self, post, username, password=None, token=None):
         try:
             if not password and not token:
-                raise ValueError
+                return
 
             self.captcha_key = post.get('captcha')
             self.captcha_sid = post.get('sid')
 
             if token:
                 vk_session = VkApi(login=username, config_filename='config.json', token=token,
-                                   captcha_handler=self.captcha_handler)
+                                   captcha_handler=self.captcha_handler, auth_handler=self.auth_handler)
             else:
                 vk_session = VkApi(login=username, config_filename='config.json', password=password,
-                                   captcha_handler=self.captcha_handler)
+                                   captcha_handler=self.captcha_handler,
+                                   auth_handler=self.auth_handler)
             vk_session.auth(token_only=True)
             return vk_session
         except Exception as e:
