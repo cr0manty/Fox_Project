@@ -70,7 +70,7 @@ class VKAuthMixin(object):
     def captcha_handler(self, captcha):
         if self.captcha_key and self.captcha_sid:
             captcha.sid = self.captcha_sid
-            self.captcha_key, self.captcha_sid = None, None
+            self.captcha_sid = None
             return captcha.try_again(self.captcha_key)
         else:
             self.captcha_url, self.captcha_sid = captcha.get_url(), captcha.sid
@@ -89,7 +89,7 @@ class VKAuthMixin(object):
             else:
                 vk_session = VkApi(login=username, config_filename='config.json', password=password,
                                    captcha_handler=self.captcha_handler)
-            vk_session.auth(token_only=True)
+            vk_session.auth(token_only=token is not None)
             return vk_session
         except Exception as e:
             Log.objects.create(exception=e, additional_text=username)
