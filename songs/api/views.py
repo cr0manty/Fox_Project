@@ -95,12 +95,11 @@ class UserSongListAPIView(AmountModelViewSet, VKAuthMixin):
     def create(self, request, *args, **kwargs):
         user = request.user
         try:
-            vk_session = self.try_auth(request.POST, user.vk_login, token=user.auth_token)
-            uid = vk_session.method("users.get")[0]["id"]
+            self.try_auth(request.POST, user.vk_login, token=user.auth_token)
             if self.captcha_url:
                 return Response({'url': self.captcha_url, 'sid': self.captcha_sid}, status=302)
 
-            get_user_songs(user, vk_session, uid)
+            get_user_songs(user)
             return Response('Success', status=201)
         except Exception as e:
             err_text = 'Cant connect to vk server'

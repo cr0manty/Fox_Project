@@ -89,7 +89,7 @@ class VKAuthMixin(object):
             else:
                 vk_session = VkApi(login=username, config_filename='config.json', password=password,
                                    captcha_handler=self.captcha_handler)
-            vk_session.auth(token_only=token is not None)
+            vk_session.auth(token_only=token is not None, reauth=True)
             return vk_session
         except Exception as e:
             Log.objects.create(exception=e, additional_text=username)
