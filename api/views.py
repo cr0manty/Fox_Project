@@ -12,12 +12,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-from vk_api import VkApi
 from uuid import uuid4
 
 from core.models import VKAuthMixin
 from home.models import MyApp
-from songs.models import update_user_songs
+from songs.tasks import get_user_songs
+
 from .serializers import UserSerializer, MyAppSerializer
 
 User = get_user_model()
@@ -52,7 +52,7 @@ class SignInView(ObtainAuthToken):
         if settings.USE_REDIS and request.data.get('username'):
             try:
                 user = User.objects.get(username=request.data['username'], can_use_vk=True)
-                update_user_songs.delay(user=user)
+                get_user_songs(user)
             except User.DoesNotExist:
                 pass
         return super().post(request, *args, **kwargs)
