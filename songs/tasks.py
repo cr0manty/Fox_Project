@@ -2,7 +2,7 @@ import datetime
 
 from django_rq import job
 from vk_api import VkApi
-from vk_audio import audio
+# from vk_audio import audio
 
 from core.models import RQLog
 from songs.models import Song
@@ -12,6 +12,7 @@ from songs.utils import GetSongUtils
 @job
 def job_get_user_songs(user):
     vk_session = VkApi(login=user.vk_login, config_filename='config.json', token=user.vk_auth_token)
+    vk_session.auth(token_only=True)
     uid = vk_session.method("users.get")[0]["id"]
 
     try:
