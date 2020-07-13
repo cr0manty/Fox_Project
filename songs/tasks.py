@@ -11,6 +11,7 @@ from songs.utils import GetSongUtils
 @job('default', timeout=1000)
 def job_get_user_songs(user):
     vk_session = VkApi(login=user.vk_login, config_filename='config.json', token=user.vk_auth_token)
+    vk_session.auth(token_only=True)
     uid = vk_session.method("users.get")[0]["id"]
 
     try:
