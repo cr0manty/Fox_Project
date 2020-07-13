@@ -9,7 +9,7 @@ class SongListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        exclude = ('users', 'id', 'users_ignore', 'posted_at', 'updated_at')
+        exclude = ('users', 'id', 'users_ignore', 'posted_at', 'updated_at', 'ignore_time')
         read_only = ('in_my_list',)
         extra_kwargs = {'song_id': {'required': False}}
 
