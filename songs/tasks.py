@@ -2,22 +2,19 @@ import datetime
 
 from django_rq import job
 from vk_api import VkApi
-from vk_audio import audio
 
 from core.models import RQLog
 from songs.models import Song
 from songs.utils import GetSongUtils
 
 
-@job
+@job('default', timeout=1000)
 def job_get_user_songs(user):
     vk_session = VkApi(login=user.vk_login, config_filename='config.json', token=user.vk_auth_token)
     uid = vk_session.method("users.get")[0]["id"]
 
     try:
         get_songs = GetSongUtils(vk_session, uid)
-
-        # audio_list = audio(vk_session).get()
         audio_list = get_songs.get_vk_songs()
     except Exception as e:
         RQLog.objects.create(exception=str(e), additional_text='Cant connect to vk server', from_user=user.username)

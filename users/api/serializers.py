@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('password', 'vk_login',
+        exclude = ('password', 'vk_login', 'vk_auth_token',
                    'user_permissions', 'groups', 'is_active',
                    'is_superuser', 'last_login')
 
