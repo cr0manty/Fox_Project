@@ -12,8 +12,6 @@ class HomeView(View):
         apps = MyApp.objects.all()
         return render(request, 'home/home.html', context={
             'apps': apps,
-            'amount': apps.count(),
-            'even': not bool(apps.count() % 2)
         })
 
 
